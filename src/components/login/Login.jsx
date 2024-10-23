@@ -1,0 +1,303 @@
+import React, { useEffect, useState } from 'react'
+import { json, useNavigate } from "react-router-dom";
+import { Box, Grid, Hidden, InputBase, styled, Typography } from '@mui/material'
+import { toast } from "react-toastify";
+import { LoginApi, RegisterApi } from '../../api/AuthApi';
+
+//icons
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { onAuthStateChanged } from 'firebase/auth';
+import Loader from '../common/Loader';
+import { auth } from '../../firebaseConfig';
+
+// tilt
+
+// styled
+const GridContainer = styled(Grid)`
+    height:100vh;
+`
+const CardContainer = styled(Grid)`
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(0deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
+`
+const LogoContainer = styled(Grid)`
+    display:flex;
+    position:relative;
+    justify-content:center;
+    align-items:center;
+    font-size:9rem;
+    font-style:italic;
+    font-weight:400;
+    font-family: "Nosifer", sans-serif;
+    background: linear-gradient(90deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
+    background-clip: text; /* Clipping the background to the text */
+    color: transparent; /* Make text color transparent */
+`
+
+const Card = styled(Grid)`
+  color:white;
+  height:60vh;
+  border-radius:10px;
+  box-sizing:border-box;
+  padding:1rem;
+  transform: rotateY(10deg);
+`
+const FormHeader = styled(Typography)`
+    font-size:2rem;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+    margin-bottom:2rem;
+    font-family: "Noto Sans", sans-serif;
+    letter-spacing:2px;
+`
+const Form = styled("form")({
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    gap: "2.5rem",
+})
+
+const Input = styled(InputBase)`
+    font-family: "Noto Sans", sans-serif;
+    color:white;
+    width:80%;
+    box-sizing:border-box;
+    border-bottom:2px solid white;
+    font-weight:700;  
+
+    & ::placeholder{
+    font-weight:800;
+    }
+`
+const SignUpLabel = styled(Box)`
+    margin-top:2rem;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+`
+
+const IconContainer = styled('div')({
+    position: "relative",
+    display: 'flex',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+})
+const Icon = styled('div')({
+    position: "absolute",
+    top: 0,
+    right: 37,
+    cursor: "pointer"
+})
+
+const ToggleText = styled(Box)`
+color:white;
+font-weight:600;
+`
+
+// Main functional component
+const loginInitialValues = {
+    email: "",
+    password: "",
+}
+const signUpInitialValues = {
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+}
+
+const Login = ({ setIsAuthenticated, ...props }) => {
+
+    const [login, setLogin] = useState(loginInitialValues);
+    const [signUp, setSignUp] = useState(signUpInitialValues);
+    const [isSignUp, setIsSignUp] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [loading, setLoading] = useState(true);
+
+    // navigate object
+    const navigate = useNavigate();
+
+    // check this later
+    useEffect(() => {
+        onAuthStateChanged(auth, (res) => {
+            if (res?.accessToken && res.emailVerified) {
+                // navigate("/home");
+                // create home page to navigate
+                // remove set loading and use store and actions to store user details in redux files
+                console.log("already logged in")
+                setLoading(false);
+            } else {
+                setLoading(false);
+            }
+        })
+    }, [])
+
+    const toggleSignUpLabel = () => {
+        setLogin(loginInitialValues);
+        setSignUp(signUpInitialValues);
+        setIsSignUp(isSignUp => !isSignUp);
+        setIsVisible(true)
+    }
+
+    const updateInputFields = (e, formType) => {
+        if (formType === 'login') setLogin({ ...login, [e.target.name]: e.target.value });
+        else setSignUp({ ...signUp, [e.target.name]: e.target.value });
+    }
+
+    const validateForm = async (e) => {
+        e.preventDefault();
+    
+        // Email regex
+        const emailRegex = /^.+@students\.git\.edu$/;
+    
+        // Password regex
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
+    
+        if (isSignUp) {
+            try {
+                const emailValid = emailRegex.test(signUp.email);
+                const passwordValid = passwordRegex.test(signUp.password);
+    
+                if (!emailValid) {
+                    toast.error("Invalid email. use College email");
+                    return;
+                }
+                
+                if (!passwordValid) {
+                    toast.warning("Password should be at least 8 characters long and contain upper case, lower case, and special characters.");
+                    return;
+                }
+    
+                if (signUp.password !== signUp.confirmPassword) {
+                    toast.error("Passwords didn't match.");
+                    return;
+                }
+    
+                let res = await RegisterApi(signUp.email, signUp.password);
+                if (res.success) {
+                    setLogin(loginInitialValues);
+                    setSignUp(signUpInitialValues);
+                    setIsSignUp(false);
+                    toast.info("E-mail verification sent to registered email.");
+                } else if (res.error === "Email already in use") {
+                    toast.error("E-mail already in use.");
+                } else {
+                    toast.error("Error while signing up.");
+                }
+            } catch (err) {
+                toast.error("Error while signing up.");
+            }
+        } else {
+            try {
+                const emailValid = emailRegex.test(login.email);
+                const passwordValid = passwordRegex.test(login.password);
+    
+                if (!emailValid) {
+                    toast.error("Invalid email. Use college Email");
+                    return;
+                }
+    
+                if (!passwordValid) {
+                    toast.error("Invalid password.");
+                    return;
+                }
+    
+                let res = await LoginApi(login.email, login.password);
+                if (!res.user.emailVerified) {
+                    toast.warning("Email verification pending.");
+                } else {
+                    toast.success("Login successful, navigate now.");
+                    // Add navigation logic here, e.g., navigate("/home");
+                }
+            } catch (err) {
+                toast.error("Invalid credentials.");
+            }
+        }
+    };
+
+return (
+    loading ? <Loader /> :
+        <GridContainer container>
+            <LogoContainer item lg={6} md={12}>
+                <Hidden mdDown>
+                    QuiGit
+                </Hidden>
+            </LogoContainer>
+
+            <CardContainer container item lg={6} xs={12} md={12}>
+
+                <Card item lg={6} xs={10} md={10}>
+                    <FormHeader>{isSignUp ? "Sign up" : "Login"}</FormHeader>
+                    <Form onSubmit={(e) => validateForm(e)} >
+                        {
+                            isSignUp ?
+                                <>
+                                    {/* <Input placeholder="Enter your name" name="name" type='text' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.name} required /> */}
+                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.email} required autoComplete='off' />
+                                    <IconContainer>
+                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.password} required autoComplete='off' />
+                                        <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
+                                            {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                        </Icon>
+                                    </IconContainer>
+                                    <Input placeholder="Confirm your password" name="confirmPassword" type='password' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.confirmPassword} required autoComplete='off' />
+                                    <Input type='submit' sx={{
+                                        cursor: 'pointer',
+                                        backgroundColor: "white",
+                                        color: 'black',
+                                        fontWeight: "700",
+                                        padding: "0.3rem",
+                                        borderRadius: "5px",
+                                    }}
+                                    />
+                                </>
+                                :
+                                <>
+                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'login')} value={login.email} required autoComplete='off' />
+
+                                    <IconContainer>
+                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'login')} value={login.password} required autoComplete='off' />
+                                        <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
+                                            {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                        </Icon>
+                                    </IconContainer>
+                                    <Input type='submit' sx={{
+                                        cursor: 'pointer',
+                                        backgroundColor: "white",
+                                        color: 'black',
+                                        fontWeight: "700",
+                                        padding: "0.3rem",
+                                        borderRadius: "5px",
+                                    }} />
+                                </>
+                        }
+                    </Form>
+
+                    <SignUpLabel onClick={() => toggleSignUpLabel()}>
+                        <Box sx={{
+                            // color: 'black',
+                            fontWeight: "600",
+                            // backgroundColor: "white",
+                            width: "15rem",
+                            textAlign: 'center',
+                            borderRadius: "15px"
+                        }}>{isSignUp ? <ToggleText><span style={{ fontWeight: "400", color: "red", textDecoration: "underline" }}></span>&nbsp;&nbsp; Login</ToggleText>
+                            : <ToggleText><span style={{ fontWeight: "400", color: "red", textDecoration: "underline" }}></span>&nbsp;&nbsp;Sign Up</ToggleText>}</Box>
+                    </SignUpLabel>
+
+                </Card>
+            </CardContainer>
+        </GridContainer>
+)
+}
+
+export default Login
