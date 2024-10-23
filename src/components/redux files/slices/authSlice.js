@@ -2,25 +2,31 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { 
+  initialState: {
     isAuthenticated: false,
-    isAnonymous:false
-   },
+    user: null,
+  },
   reducers: {
-    login: (state) => {
+    login: (state, action) => {
       state.isAuthenticated = true;
-      state.isAnonymous=false;
+      const { uid, email, displayName } = action.payload; // Extract necessary fields
+      state.user = { uid, email, displayName };
+      localStorage.setItem('user', JSON.stringify(action.payload)); 
     },
     logout: (state) => {
       state.isAuthenticated = false;
-      state.isAnonymous=false;
+      state.user = null;
+      localStorage.removeItem('user');
     },
-    loginAnonymously:(state)=>{
-      state.isAnonymous=true;
-      state.isAuthenticated=true;
-    }
+    setUserFromLocalStorage: (state) => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+          state.isAuthenticated = true;
+          state.user = user;
+      }
+    },
   },
 });
 
-export const { login, logout,loginAnonymously } = authSlice.actions;
+export const { login, logout,setUserFromLocalStorage } = authSlice.actions;
 export default authSlice.reducer;

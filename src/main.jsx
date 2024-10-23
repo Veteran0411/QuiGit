@@ -8,11 +8,12 @@ import "./index.css"
 // toastify imports
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Login from './components/login/Login.jsx';
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-      <App />
-      <ToastContainer
+    <App />
+    <ToastContainer
       position="top-right"
       autoClose={2000}
       hideProgressBar={false}
@@ -24,6 +25,6 @@ createRoot(document.getElementById('root')).render(
       pauseOnHover
       theme="dark"
       transition:Bounce
-/>
+    />
   </Provider>
 )

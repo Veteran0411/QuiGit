@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { json, useNavigate } from "react-router-dom";
 import { Box, Grid, Hidden, InputBase, styled, Typography } from '@mui/material'
 import { toast } from "react-toastify";
-import { LoginApi, RegisterApi } from '../../api/AuthApi';
+import { LoginApi, RegisterApi, SignOutApi } from '../../api/AuthApi';
 
 //icons
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Loader from '../common/Loader';
 import { auth } from '../../firebaseConfig';
+import { login,logout } from '../redux files/slices/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
 // tilt
 
@@ -115,26 +117,28 @@ const signUpInitialValues = {
     confirmPassword: ""
 }
 
-const Login = ({ setIsAuthenticated, ...props }) => {
+const Login = () => {
 
-    const [login, setLogin] = useState(loginInitialValues);
-    const [signUp, setSignUp] = useState(signUpInitialValues);
+    const [loginValues, setLoginValues] = useState(loginInitialValues);
+    const [signUpValues, setSignUpValues] = useState(signUpInitialValues);
     const [isSignUp, setIsSignUp] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [loading, setLoading] = useState(true);
 
     // navigate object
     const navigate = useNavigate();
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
     // check this later
     useEffect(() => {
         onAuthStateChanged(auth, (res) => {
             if (res?.accessToken && res.emailVerified) {
-                // navigate("/home");
+                setLoading(false);
                 // create home page to navigate
                 // remove set loading and use store and actions to store user details in redux files
-                console.log("already logged in")
-                setLoading(false);
+                console.log("already logged in, navigating inside use Effect")
+                console.log(res)
+                navigate("/home");
             } else {
                 setLoading(false);
             }
@@ -142,15 +146,15 @@ const Login = ({ setIsAuthenticated, ...props }) => {
     }, [])
 
     const toggleSignUpLabel = () => {
-        setLogin(loginInitialValues);
-        setSignUp(signUpInitialValues);
+        setLoginValues(loginInitialValues);
+        setSignUpValues(signUpInitialValues);
         setIsSignUp(isSignUp => !isSignUp);
         setIsVisible(true)
     }
 
     const updateInputFields = (e, formType) => {
-        if (formType === 'login') setLogin({ ...login, [e.target.name]: e.target.value });
-        else setSignUp({ ...signUp, [e.target.name]: e.target.value });
+        if (formType === 'login') setLoginValues({ ...loginValues, [e.target.name]: e.target.value });
+        else setSignUpValues({ ...signUpValues, [e.target.name]: e.target.value });
     }
 
     const validateForm = async (e) => {
@@ -164,8 +168,8 @@ const Login = ({ setIsAuthenticated, ...props }) => {
     
         if (isSignUp) {
             try {
-                const emailValid = emailRegex.test(signUp.email);
-                const passwordValid = passwordRegex.test(signUp.password);
+                const emailValid = emailRegex.test(signUpValues.email);
+                const passwordValid = passwordRegex.test(signUpValues.password);
     
                 if (!emailValid) {
                     toast.error("Invalid email. use College email");
@@ -177,15 +181,15 @@ const Login = ({ setIsAuthenticated, ...props }) => {
                     return;
                 }
     
-                if (signUp.password !== signUp.confirmPassword) {
+                if (signUpValues.password !== signUpValues.confirmPassword) {
                     toast.error("Passwords didn't match.");
                     return;
                 }
     
-                let res = await RegisterApi(signUp.email, signUp.password);
+                let res = await RegisterApi(signUpValues.email, signUpValues.password);
                 if (res.success) {
-                    setLogin(loginInitialValues);
-                    setSignUp(signUpInitialValues);
+                    setLoginValues(loginInitialValues);
+                    setSignUpValues(signUpInitialValues);
                     setIsSignUp(false);
                     toast.info("E-mail verification sent to registered email.");
                 } else if (res.error === "Email already in use") {
@@ -198,8 +202,8 @@ const Login = ({ setIsAuthenticated, ...props }) => {
             }
         } else {
             try {
-                const emailValid = emailRegex.test(login.email);
-                const passwordValid = passwordRegex.test(login.password);
+                const emailValid = emailRegex.test(loginValues.email);
+                const passwordValid = passwordRegex.test(loginValues.password);
     
                 if (!emailValid) {
                     toast.error("Invalid email. Use college Email");
@@ -211,12 +215,16 @@ const Login = ({ setIsAuthenticated, ...props }) => {
                     return;
                 }
     
-                let res = await LoginApi(login.email, login.password);
+                let res = await LoginApi(loginValues.email, loginValues.password);
                 if (!res.user.emailVerified) {
                     toast.warning("Email verification pending.");
                 } else {
+
+                    // the value is changed but not persisted
                     toast.success("Login successful, navigate now.");
-                    // Add navigation logic here, e.g., navigate("/home");
+                    console.log("navigating inside login call");
+                    navigate("/home");
+                
                 }
             } catch (err) {
                 toast.error("Invalid credentials.");
@@ -242,14 +250,14 @@ return (
                             isSignUp ?
                                 <>
                                     {/* <Input placeholder="Enter your name" name="name" type='text' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.name} required /> */}
-                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.email} required autoComplete='off' />
+                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.email} required autoComplete='off' />
                                     <IconContainer>
-                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.password} required autoComplete='off' />
+                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.password} required autoComplete='off' />
                                         <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
                                             {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                         </Icon>
                                     </IconContainer>
-                                    <Input placeholder="Confirm your password" name="confirmPassword" type='password' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.confirmPassword} required autoComplete='off' />
+                                    <Input placeholder="Confirm your password" name="confirmPassword" type='password' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.confirmPassword} required autoComplete='off' />
                                     <Input type='submit' sx={{
                                         cursor: 'pointer',
                                         backgroundColor: "white",
@@ -262,10 +270,10 @@ return (
                                 </>
                                 :
                                 <>
-                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'login')} value={login.email} required autoComplete='off' />
+                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'login')} value={loginValues.email} required autoComplete='off' />
 
                                     <IconContainer>
-                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'login')} value={login.password} required autoComplete='off' />
+                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'login')} value={loginValues.password} required autoComplete='off' />
                                         <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
                                             {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                         </Icon>
