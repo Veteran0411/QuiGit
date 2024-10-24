@@ -12,7 +12,6 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     dispatch(setUserFromLocalStorage());
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in
@@ -20,6 +19,7 @@ const AuthProvider = ({ children }) => {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
+          phoneNumber:user.phoneNumber
         })); // Dispatch login with user info
         if (!user.emailVerified) {
           navigate('/'); // Redirect if email is not verified

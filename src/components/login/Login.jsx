@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { json, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import { Box, Grid, Hidden, InputBase, styled, Typography } from '@mui/material'
 import { toast } from "react-toastify";
 import { LoginApi, RegisterApi, SignOutApi } from '../../api/AuthApi';
@@ -7,11 +7,11 @@ import { LoginApi, RegisterApi, SignOutApi } from '../../api/AuthApi';
 //icons
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged} from 'firebase/auth';
 import Loader from '../common/Loader';
 import { auth } from '../../firebaseConfig';
-import { login,logout } from '../redux files/slices/authSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector} from 'react-redux';
+import BlobSvg from '../svg/BlobSvg';
 
 // tilt
 
@@ -31,9 +31,10 @@ const LogoContainer = styled(Grid)`
     justify-content:center;
     align-items:center;
     font-size:9rem;
-    font-style:italic;
+    // font-style:italic;
     font-weight:400;
-    font-family: "Nosifer", sans-serif;
+    // font-family: "Nosifer", sans-serif;
+    font-family: "Reggae One", serif;
     background: linear-gradient(90deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
     background-clip: text; /* Clipping the background to the text */
     color: transparent; /* Make text color transparent */
@@ -82,6 +83,7 @@ const SignUpLabel = styled(Box)`
     margin-top:2rem;
     display:flex;
     justify-content:center;
+    font-family: "Noto Sans", sans-serif;
     align-items:center;
     cursor:pointer;
 `
@@ -103,6 +105,9 @@ const Icon = styled('div')({
 const ToggleText = styled(Box)`
 color:white;
 font-weight:600;
+font-family: "Noto Sans", sans-serif;
+cursor:pointer;
+letter-spacing:0.5px;
 `
 
 // Main functional component
@@ -127,8 +132,6 @@ const Login = () => {
 
     // navigate object
     const navigate = useNavigate();
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-
     // check this later
     useEffect(() => {
         onAuthStateChanged(auth, (res) => {
@@ -136,8 +139,6 @@ const Login = () => {
                 setLoading(false);
                 // create home page to navigate
                 // remove set loading and use store and actions to store user details in redux files
-                console.log("already logged in, navigating inside use Effect")
-                console.log(res)
                 navigate("/home");
             } else {
                 setLoading(false);
@@ -235,9 +236,10 @@ const Login = () => {
 return (
     loading ? <Loader /> :
         <GridContainer container>
-            <LogoContainer item lg={6} md={12}>
+            <LogoContainer item lg={6} md={12} style={{position:"relative"}}>
                 <Hidden mdDown>
-                    QuiGit
+                    QuiG!t
+                    {/* <BlobSvg/> */}
                 </Hidden>
             </LogoContainer>
 
@@ -297,9 +299,10 @@ return (
                             // backgroundColor: "white",
                             width: "15rem",
                             textAlign: 'center',
+                            cursor:'pointer',
                             borderRadius: "15px"
-                        }}>{isSignUp ? <ToggleText><span style={{ fontWeight: "400", color: "red", textDecoration: "underline" }}></span>&nbsp;&nbsp; Login</ToggleText>
-                            : <ToggleText><span style={{ fontWeight: "400", color: "red", textDecoration: "underline" }}></span>&nbsp;&nbsp;Sign Up</ToggleText>}</Box>
+                        }}>{isSignUp ? <ToggleText>Login</ToggleText>
+                            : <ToggleText>Sign Up</ToggleText>}</Box>
                     </SignUpLabel>
 
                 </Card>
