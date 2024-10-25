@@ -9,8 +9,8 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.isAuthenticated = true;
-      const { uid, email, displayName } = action.payload; // Extract necessary fields
-      state.user = { uid, email, displayName };
+      const { uid, email, displayName,phoneNumber } = action.payload; // Extract necessary fields
+      state.user = { uid, email, displayName,phoneNumber };
       localStorage.setItem('user', JSON.stringify(action.payload)); 
     },
     logout: (state) => {
@@ -25,8 +25,16 @@ const authSlice = createSlice({
           state.user = user;
       }
     },
+
+    // here i should get value from firebase store
+    updateUser: (state, action) => {
+      if (state.user) {
+        state.user.displayName = action.payload.displayName;
+        localStorage.setItem('user', JSON.stringify(state.user)); // Update localStorage with new displayName
+      }
+    }
   },
 });
 
-export const { login, logout,setUserFromLocalStorage } = authSlice.actions;
+export const { login, logout,setUserFromLocalStorage,updateUser} = authSlice.actions;
 export default authSlice.reducer;

@@ -12,6 +12,7 @@ import Loader from '../common/Loader';
 import { auth } from '../../firebaseConfig';
 import { useSelector} from 'react-redux';
 import BlobSvg from '../svg/BlobSvg';
+import "./login.css"
 
 // tilt
 
@@ -31,7 +32,6 @@ const LogoContainer = styled(Grid)`
     justify-content:center;
     align-items:center;
     font-size:9rem;
-    // font-style:italic;
     font-weight:400;
     // font-family: "Nosifer", sans-serif;
     font-family: "Reggae One", serif;
@@ -137,6 +137,7 @@ const Login = () => {
         onAuthStateChanged(auth, (res) => {
             if (res?.accessToken && res.emailVerified) {
                 setLoading(false);
+                console.log(res)
                 // create home page to navigate
                 // remove set loading and use store and actions to store user details in redux files
                 navigate("/home");

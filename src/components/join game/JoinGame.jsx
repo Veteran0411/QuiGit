@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { SignOutApi } from "../../api/AuthApi";
 import { setUserFromLocalStorage } from "../redux files/slices/authSlice";
 
+
 // mui imports
 import { Box, Button, TextField, Typography } from '@mui/material';
 
@@ -60,6 +61,7 @@ const JoinGame = () => {
                     Submit
                 </Button>
             </form>
+            <div onClick={()=>SignOutApi()}>Signout</div>
         </Box>
     )
 }
