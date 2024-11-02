@@ -4,6 +4,7 @@ import Login from './components/login/Login';
 import Home from './components/home/Home';
 import AuthProvider from './components/common/AuthProvider';
 import JoinGame from './components/join game/JoinGame';
+import CreateQuestion from './components/create questions/CreateQuestion';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path='/' element={<Login />} />
             <Route path='/home' element={<Home />} />
             <Route path='/joinGame' element={<JoinGame />} />
+            <Route path='/createQuestion' element={<CreateQuestion/>} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
