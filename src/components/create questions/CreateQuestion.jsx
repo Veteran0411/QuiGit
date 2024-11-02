@@ -26,45 +26,6 @@ const CreateQuestion = () => {
 
   // create three sections using grid
   return (
-    // <div
-    //   className="create-question-container"
-    //   style={{
-    //     display: "flex",
-    //     flexDirection: "column",
-    //     alignItems: "center",
-    //     padding: "20px",
-    //   }}
-    // >
-    //   <h2>Create Question</h2>
-    //   <div
-    //     style={{
-    //       display: "grid",
-    //       gridTemplateColumns: "1fr 2fr 1fr",
-    //       gridGap: "0",
-    //       width: "100%",
-    //       height: "calc(100vh - 80px)",
-    //     }}
-    //   >
-    //     {" "}
-    //     <div style={{ backgroundColor: "#f0f0f0" }}></div>
-    //     <div
-    //       style={{
-    //         border: "1px solid #ccc",
-    //         borderRadius: "5px",
-    //         padding: "15px",
-    //       }}
-    //     >
-    //       <button onClick={addQuestion}>Add Question</button>
-    //       {questions.map((_, index) => (
-    //         <div key={index}>
-    //           <AddNewQuestion />
-    //         </div>
-    //       ))}
-    //     </div>
-    //     <div style={{ backgroundColor: "#f0f0f0" }}></div>
-    //   </div>
-    // </div>
-
     <div
       className="create-question-container"
       style={{
@@ -186,35 +147,6 @@ const CreateQuestion = () => {
         <div style={{ backgroundColor: "#f0f0f0" }}></div>
       </div>
     </div>
-    // <div
-    //   style={{
-    //     display: "flex",
-    //     flexDirection: "column",
-    //     alignItems: "center",
-    //     padding: "20px",
-    //   }}
-    // >
-    //   <h2>Create Question</h2>
-    //   <div
-    //     style={{
-    //       display: "grid",
-    //       gridTemplateColumns: "1fr 2fr 1fr",
-    //       gap: "10px",
-    //       width: "80%",
-    //     }}
-    //   >
-    //     <div style={{ backgroundColor: "#f0f0f0" }}></div>
-    //     <div style={{ border: "1px solid #ccc", padding: "10px" }}>
-    //       <button onClick={addQuestion}>Add Question</button>
-    //       {questions.map((_, index) => (
-    //         <div key={index}>
-    //           <AddNewQuestion />
-    //         </div>
-    //       ))}
-    //     </div>
-    //     <div style={{ backgroundColor: "#f0f0f0" }}></div>
-    //   </div>
-    // </div>
   );
 };
 

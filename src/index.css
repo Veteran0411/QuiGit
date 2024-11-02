@@ -1,6 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Reggae+One&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nosifer&family=Reggae+One&display=swap");
 
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.create-question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+  grid-gap: 10px; /* Gap between columns */
+  width: 100%; /* Adjust width as needed */
+}
+
+.side-section {
+  background-color: #f0f0f0; /* Optional background color for side sections */
+}
+
+.question-section {
+  grid-column: span 2; /* Spans across two columns */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.question-section .question {
+  margin-bottom: 10px;
+}
+
+.question-section .options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.question-section .option {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.app-header {
+  width: 66rem;
+  margin-bottom: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
