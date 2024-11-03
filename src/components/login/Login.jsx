@@ -24,7 +24,7 @@ const CardContainer = styled(Grid)`
     display:flex;
     justify-content:center;
     align-items:center;
-    background: linear-gradient(0deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 `
 const LogoContainer = styled(Grid)`
     display:flex;
@@ -35,7 +35,8 @@ const LogoContainer = styled(Grid)`
     font-weight:400;
     // font-family: "Nosifer", sans-serif;
     font-family: "Reggae One", serif;
-    background: linear-gradient(90deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
+    // background: linear-gradient(90deg, rgba(179,35,242,1) 25%, rgba(119,118,255,1) 98%);
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     background-clip: text; /* Clipping the background to the text */
     color: transparent; /* Make text color transparent */
 `

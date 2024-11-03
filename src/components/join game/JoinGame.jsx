@@ -41,7 +41,8 @@ const JoinGame = () => {
             minHeight="100vh"
         >
             <Typography variant="h4" gutterBottom>
-                Join Game
+                Join Game 
+                {/* {user.displayName} */}
             </Typography>
             <form onSubmit={handleSubmit}>
                 <TextField

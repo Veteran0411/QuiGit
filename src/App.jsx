@@ -5,6 +5,7 @@ import Home from './components/home/Home';
 import AuthProvider from './components/common/AuthProvider';
 import JoinGame from './components/join game/JoinGame';
 import CreateQuestion from './components/create questions/CreateQuestion';
+import UserDetails from './components/user details/UserDetails';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path='/home' element={<Home />} />
             <Route path='/joinGame' element={<JoinGame />} />
             <Route path='/createQuestion' element={<CreateQuestion/>} />
+            <Route path='/userDetails' element={<UserDetails/>} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
