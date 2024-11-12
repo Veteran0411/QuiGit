@@ -40,72 +40,75 @@ const CreateQuestion = () => {
 
     // change the section into more good format
     return (
-            <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Grid container spacing={2}>
-                {/* Left Section: Navigation for created questions */}
-                <Grid item xs={12} lg={2.5}>
-                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: '#f5f5f5' }}>
-                        <Typography variant="h6" gutterBottom>
-                            Navigate Questions
-                        </Typography>
-                        <List>
-                            {questions.map((question, index) => (
-                                <ListItem key={index} disablePadding>
-                                    <ListItemButton onClick={() => handleQuestionClick(index)}>
-                                        <ListItemText primary={question.text} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Paper>
+                <Grid container alignItems="center"
+                sx={{
+                            p: 4,
+                            minHeight: '100vh',
+                            background: 'linear-gradient(to bottom, #1b2735, #090a0f)', // Dark gradient background
+                        }}
+                >
+                    {/* Left Section: Navigation for created questions */}
+                    <Grid item xs={12} lg={3}>
+                        <Paper elevation={3} sx={{ p: 2, borderRadius: 3, backgroundColor: '#f5f5f5',margin:2,top:0 }}>
+                            <Typography variant="h6" align="center" gutterBottom>
+                                Navigate Questions
+                            </Typography>
+                            <List>
+                                {questions.map((question, index) => (
+                                    <ListItem key={index} disablePadding>
+                                        <ListItemButton onClick={() => handleQuestionClick(index)}>
+                                            <ListItemText primary={question.text} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Paper>
+                    </Grid>
+    
+                    {/* Middle Section: Main Question Creation Area */}
+                    <Grid item xs={12} lg={6}>
+                        <Paper elevation={3} sx={{ p: 4, borderRadius: 3, backgroundColor: '#f9f9f9' }}>
+                            <Typography variant="h3" align="center" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                Choose an Option
+                            </Typography>
+                            <Typography variant="body1" align="center" sx={{ color: '#7a7a7a', mb: 3 }}>
+                                Join us in the world of programming and turn your ideas into reality. Learn to code and shape the digital future with us.
+                            </Typography>
+                            <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <AddNewQuestion 
+                                    question={currentQuestion} // Pass the current question
+                                    setQuestion={setCurrentQuestion} // Function to update current question
+                                />
+                            </Box>
+                        </Paper>
+                    </Grid>
+    
+                    {/* Right Section: Question Type and Additional Settings */}
+                    <Grid item xs={12} lg={3}>
+                        <Paper elevation={3} sx={{ p: 3, borderRadius: 3, backgroundColor: '#f5f5f5',margin:2}}>
+                            <Typography variant="h6" align="center" gutterBottom>
+                                Question Settings
+                            </Typography>
+    
+                            <Typography variant="subtitle1" align="center" sx={{ mb: 1, color: '#333' }}>
+                                Game PIN: {gamePin}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'center',mb: 3  }}>
+                                <Button variant="contained" color="primary" onClick={addQuestion} sx={{ width: '100%', borderRadius: 2 }}>
+                                    Add Question
+                                </Button>
+                            </Box>
+    
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Button variant="outlined" color="secondary" onClick={getGamePin} sx={{ width: '100%', mb: 3 }}>
+                                    Create Game
+                                </Button>
+                            </Box>
+    
+                        </Paper>
+                    </Grid>
                 </Grid>
-
-                {/* Middle Section: Main Question Creation Area */}
-                <Grid item xs={12} lg={7}>
-                    <Paper elevation={3} sx={{ p: 4, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
-                        <Typography variant="h4" align="center" gutterBottom>
-                            Create a New Question
-                        </Typography>
-
-                        <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <AddNewQuestion 
-                                question={currentQuestion} // Pass the current question
-                                setQuestion={setCurrentQuestion} // Function to update current question
-                            />
-                        </Box>
-                    </Paper>
-                </Grid>
-
-                {/* Right Section: Question Type and Additional Settings */}
-                <Grid item xs={12} lg={2.5}>
-                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: '#f5f5f5' }}>
-                        <Typography variant="h6" gutterBottom>
-                            Question Settings
-                        </Typography>
-
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            Game PIN: {gamePin}
-                        </Typography>
-
-                        <Button variant="outlined" color="secondary" onClick={getGamePin} sx={{ mb: 3 }}>
-                            Create Game
-                        </Button>
-
-                        <Typography variant="body1" gutterBottom>
-                            Select Question Type:
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button variant="contained" color="primary" onClick={addQuestion}>
-                                Add Question
-                            </Button>
-                        </Box>
-
-                        {/* You can add more settings here as needed */}
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Container>
     )
 }
 

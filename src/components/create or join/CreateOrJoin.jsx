@@ -56,11 +56,11 @@ const CreateOrJoin = () => {
         {/* Left Section: Text and Buttons */}
         <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
           <Typography variant="h3" gutterBottom>
-            Choose an Option
+            Welcome to QuiGit!
             {/* {user.displayName} */}
           </Typography>
           <Typography variant="body1" sx={{ maxWidth: 500, mb: 3, mx: 'auto' }}>
-            Join us in the world of programming and turn your ideas into reality. Learn to code and shape the digital future with us.
+          Get ready to play, learn, and enjoy! Test your skills with engaging quizzes and challenge your friends as you embark on an exciting journey of knowledge.
           </Typography>
           <Box
             sx={{

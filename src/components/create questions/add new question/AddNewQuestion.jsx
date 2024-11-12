@@ -17,6 +17,7 @@ const AddNewQuestion = ({question,setQuestion}) => {
     setOptions(newOptions);
   };
 
+  // write a logic to add values in object and call reducer to store it.
   return (
     <Box
       sx={{
