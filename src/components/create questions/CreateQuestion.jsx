@@ -22,6 +22,7 @@ import {
     RadioGroup,
     FormControlLabel,
 } from "@mui/material";
+import { createGameCollection } from "../../api/FireStoreApi";
 
 const CreateQuestion = () => {
     const dispatch = useDispatch();
@@ -50,10 +51,11 @@ const CreateQuestion = () => {
                 ...questions[currentQuestionIndex],
             };
         }
-        newQuestions.push({ question: "", options: ["", "", "", ""], correctOptionIndex: null });
+        newQuestions.push({ question: "", options: ["", "", "", ""], correctOptionIndex: null,correctOptionValue:"" });
         setQuestions(newQuestions);
         setCurrentQuestionIndex(newQuestions.length - 1);
         localStorage.setItem("questions", JSON.stringify(newQuestions));
+        console.log(questions);
     };
 
     const navigateToQuestion = (index) => {
@@ -87,38 +89,46 @@ const CreateQuestion = () => {
     const handleCorrectOptionChange = (questionIndex, optionIndex) => {
         const newQuestions = [...questions];
         newQuestions[questionIndex].correctOptionIndex = optionIndex;
+        newQuestions[questionIndex].correctOptionValue =
+            newQuestions[questionIndex].options[optionIndex]; // Store the value
         setQuestions(newQuestions);
         localStorage.setItem("questions", JSON.stringify(newQuestions));
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
 
-        if (
-            questions.some(
-                (q) =>
-                    !q.question ||
-                    q.correctOptionIndex === null ||
-                    q.options.some((option) => !option)
-            )
-        ) {
-            alert(
-                "Please fill out all fields and select a correct option for each question."
-            );
-            return;
-        }
+    // generating game pin shuld be managed
+ const handleSubmit = async(event) => {
+    event.preventDefault();
+    getGamePin();
+    // Validation to ensure all fields are filled
+    if (
+        questions.some(
+            (q) =>
+                !q.question ||
+                q.correctOptionIndex === null ||
+                q.options.some((option) => !option)
+        )
+    ) {
+        alert(
+            "Please fill out all fields and select a correct option for each question."
+        );
+        return;
+    }
 
-        const submittedData = {
-            gamePin: gamePin || "No Game Pin Set",
-            questions: questions.map((q) => ({
-                question: q.question,
-                options: q.options,
-                correctOptionIndex: q.correctOptionIndex,
-            })),
-        };
-
-        console.log("Submitted Data:", submittedData);
+    // Preparing data for submission
+    const submittedData = {
+        gamePin: gamePin || "No Game Pin Set",
+        questions: questions.map((q) => ({
+            question: q.question,
+            options: q.options,
+            correctOptionIndex: q.correctOptionIndex,
+            correctOptionValue: q.correctOptionValue, // Include value in submission
+        })),
     };
+    await createGameCollection(user.email,submittedData);
+    console.log("Submitted Data:", submittedData);
+    alert("done");
+};
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
