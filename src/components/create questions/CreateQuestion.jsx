@@ -1,115 +1,267 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import AddNewQuestion from './add new question/AddNewQuestion'
-import { setUserFromLocalStorage } from '../redux files/slices/authSlice';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserFromLocalStorage } from "../redux files/slices/authSlice";
 
-// mui imports
-import { Container, Button, Typography, Box, Paper, Grid, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-
-// testing imports
+// game pin generator function
 import { generateGamePin } from './game pin generator/gamePinGenerator';
+
+// MUI Components
+import {
+    Box,
+    Button,
+    Container,
+    Grid,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Paper,
+    TextField,
+    Typography,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+} from "@mui/material";
 
 const CreateQuestion = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.auth.user);
-
+    const [gamePin, setGamePin] = useState("");
     const [questions, setQuestions] = useState([]);
-    const [gamePin,setGamePin]=useState("");
-    const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
-    const [currentQuestion, setCurrentQuestion] = useState({ text: '', type: '', options: ['', '', '', ''] });// For MCQ
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     useEffect(() => {
         dispatch(setUserFromLocalStorage());
+        const savedQuestions = JSON.parse(localStorage.getItem("questions"));
+        if (savedQuestions) {
+            setQuestions(savedQuestions);
+        }
     }, [dispatch]);
 
-    const addQuestion = () => {
-        setQuestions((prevQuestions) => [...prevQuestions, { text: `Question ${prevQuestions.length + 1}` }]);
-        setCurrentQuestion({ text: '', type: '', options: ['', '', '', ''] }); // Reset current question after adding
-        setSelectedQuestionIndex(questions.length); // Set the new question as selected
-    };
-    // game pin generation successful
-    const getGamePin=()=>{
-        const pin=generateGamePin();
+    const getGamePin = () => {
+        const pin = generateGamePin();
         setGamePin(pin);
-    }
-
-    const handleQuestionClick = (index) => {
-        setSelectedQuestionIndex(index);
-        setCurrentQuestion(questions[index]); // Load the selected question for editing
     };
 
-    // change the section into more good format
-    return (
-                <Grid container alignItems="center"
-                sx={{
-                            p: 4,
-                            minHeight: '100vh',
-                            background: 'linear-gradient(to bottom, #1b2735, #090a0f)', // Dark gradient background
-                        }}
-                >
-                    {/* Left Section: Navigation for created questions */}
-                    <Grid item xs={12} lg={3}>
-                        <Paper elevation={3} sx={{ p: 2, borderRadius: 3, backgroundColor: '#f5f5f5',margin:2,top:0 }}>
-                            <Typography variant="h6" align="center" gutterBottom>
-                                Navigate Questions
-                            </Typography>
-                            <List>
-                                {questions.map((question, index) => (
-                                    <ListItem key={index} disablePadding>
-                                        <ListItemButton onClick={() => handleQuestionClick(index)}>
-                                            <ListItemText primary={question.text} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </Paper>
-                    </Grid>
-    
-                    {/* Middle Section: Main Question Creation Area */}
-                    <Grid item xs={12} lg={6}>
-                        <Paper elevation={3} sx={{ p: 4, borderRadius: 3, backgroundColor: '#f9f9f9' }}>
-                            <Typography variant="h3" align="center" sx={{ fontWeight: 'bold' }} gutterBottom>
-                                Choose an Option
-                            </Typography>
-                            <Typography variant="body1" align="center" sx={{ color: '#7a7a7a', mb: 3 }}>
-                                Join us in the world of programming and turn your ideas into reality. Learn to code and shape the digital future with us.
-                            </Typography>
-                            <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <AddNewQuestion 
-                                    question={currentQuestion} // Pass the current question
-                                    setQuestion={setCurrentQuestion} // Function to update current question
-                                />
-                            </Box>
-                        </Paper>
-                    </Grid>
-    
-                    {/* Right Section: Question Type and Additional Settings */}
-                    <Grid item xs={12} lg={3}>
-                        <Paper elevation={3} sx={{ p: 3, borderRadius: 3, backgroundColor: '#f5f5f5',margin:2}}>
-                            <Typography variant="h6" align="center" gutterBottom>
-                                Question Settings
-                            </Typography>
-    
-                            <Typography variant="subtitle1" align="center" sx={{ mb: 1, color: '#333' }}>
-                                Game PIN: {gamePin}
-                            </Typography>
+    const addQuestion = () => {
+        const newQuestions = [...questions];
+        if (questions[currentQuestionIndex]) {
+            newQuestions[currentQuestionIndex] = {
+                ...questions[currentQuestionIndex],
+            };
+        }
+        newQuestions.push({ question: "", options: ["", "", "", ""], correctOptionIndex: null });
+        setQuestions(newQuestions);
+        setCurrentQuestionIndex(newQuestions.length - 1);
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
 
-                            <Box sx={{ display: 'flex', justifyContent: 'center',mb: 3  }}>
-                                <Button variant="contained" color="primary" onClick={addQuestion} sx={{ width: '100%', borderRadius: 2 }}>
+    const navigateToQuestion = (index) => {
+        setCurrentQuestionIndex(index);
+    };
+
+    const deleteQuestion = (index) => {
+        const newQuestions = [...questions];
+        newQuestions.splice(index, 1);
+        setQuestions(newQuestions);
+        if (index <= currentQuestionIndex) {
+            setCurrentQuestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        }
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
+
+    const handleQuestionChange = (index, value) => {
+        const newQuestions = [...questions];
+        newQuestions[index].question = value;
+        setQuestions(newQuestions);
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
+
+    const handleOptionChange = (questionIndex, optionIndex, value) => {
+        const newQuestions = [...questions];
+        newQuestions[questionIndex].options[optionIndex] = value;
+        setQuestions(newQuestions);
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
+
+    const handleCorrectOptionChange = (questionIndex, optionIndex) => {
+        const newQuestions = [...questions];
+        newQuestions[questionIndex].correctOptionIndex = optionIndex;
+        setQuestions(newQuestions);
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (
+            questions.some(
+                (q) =>
+                    !q.question ||
+                    q.correctOptionIndex === null ||
+                    q.options.some((option) => !option)
+            )
+        ) {
+            alert(
+                "Please fill out all fields and select a correct option for each question."
+            );
+            return;
+        }
+
+        const submittedData = {
+            gamePin: gamePin || "No Game Pin Set",
+            questions: questions.map((q) => ({
+                question: q.question,
+                options: q.options,
+                correctOptionIndex: q.correctOptionIndex,
+            })),
+        };
+
+        console.log("Submitted Data:", submittedData);
+    };
+
+    return (
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+                {/* Left Sidebar */}
+                <Grid item xs={12} md={3}>
+                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
+                        <Typography variant="h6" align="center" gutterBottom>
+                            Navigate Questions
+                        </Typography>
+                        <List>
+                            {questions.map((_, index) => (
+                                <ListItem key={index} disablePadding>
+                                    <ListItemButton onClick={() => navigateToQuestion(index)}>
+                                        <ListItemText primary={`Question ${index + 1}`} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Paper>
+                </Grid>
+
+                {/* Main Content */}
+                <Grid item xs={12} md={6}>
+                    <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                        <Typography variant="h5" align="center" gutterBottom>
+                            Create Questions
+                        </Typography>
+                        <form onSubmit={handleSubmit}>
+                            {questions[currentQuestionIndex] && (
+                                <Box
+                                    sx={{
+                                        mb: 3,
+                                        p: 2,
+                                        border: "1px solid #ccc",
+                                        borderRadius: 2,
+                                        backgroundColor: "#f9f9f9",
+                                    }}
+                                >
+                                    <TextField
+                                        fullWidth
+                                        label={`Question ${currentQuestionIndex + 1}`}
+                                        value={questions[currentQuestionIndex].question}
+                                        onChange={(e) =>
+                                            handleQuestionChange(currentQuestionIndex, e.target.value)
+                                        }
+                                        sx={{ mb: 2 }}
+                                    />
+
+                                    <RadioGroup
+                                        sx={{ pl: 2 }}
+                                        value={questions[currentQuestionIndex].correctOptionIndex}
+                                        onChange={(e) =>
+                                            handleCorrectOptionChange(currentQuestionIndex, parseInt(e.target.value))
+                                        }
+                                    >
+                                        {questions[currentQuestionIndex].options.map((option, optionIndex) => (
+                                            <Box
+                                                key={optionIndex}
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 2,
+                                                    p: 2,
+                                                    mb: 2,
+                                                    borderRadius: 2,
+                                                    border:
+                                                        questions[currentQuestionIndex].correctOptionIndex ===
+                                                            optionIndex
+                                                            ? "2px solid #4caf50"
+                                                            : "1px solid #ccc",
+                                                    backgroundColor:
+                                                        questions[currentQuestionIndex].correctOptionIndex ===
+                                                            optionIndex
+                                                            ? "#e8f5e9"
+                                                            : "white",
+                                                }}
+                                            >
+                                                <TextField
+                                                    fullWidth
+                                                    label={`Option ${optionIndex + 1}`}
+                                                    value={option}
+                                                    onChange={(e) =>
+                                                        handleOptionChange(
+                                                            currentQuestionIndex,
+                                                            optionIndex,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <FormControlLabel
+                                                    value={optionIndex}
+                                                    control={<Radio />}
+                                                    label=""
+                                                />
+                                            </Box>
+                                        ))}
+                                    </RadioGroup>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={() => deleteQuestion(currentQuestionIndex)}
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Delete Question
+                                    </Button>
+                                </Box>
+                            )}
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                                <Button variant="contained" color="primary" onClick={addQuestion}>
                                     Add Question
                                 </Button>
-                            </Box>
-    
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Button variant="outlined" color="secondary" onClick={getGamePin} sx={{ width: '100%', mb: 3 }}>
-                                    Create Game
+                                <Button variant="contained" color="success" type="submit">
+                                    Submit Questions
                                 </Button>
                             </Box>
-    
-                        </Paper>
-                    </Grid>
+                        </form>
+                    </Paper>
                 </Grid>
-    )
-}
+
+                {/* Right Sidebar */}
+                <Grid item xs={12} md={3}>
+                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
+                        <Typography variant="h6" align="center" gutterBottom>
+                            Game Settings
+                        </Typography>
+                        <Typography variant="subtitle1" align="center">
+                            Game PIN: {gamePin || "Not Generated"}
+                        </Typography>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="secondary"
+                            sx={{ mt: 3 }}
+                            onClick={getGamePin}
+                        >
+                            Generate Game PIN
+                        </Button>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Container>
+    );
+};
 
 export default CreateQuestion;
