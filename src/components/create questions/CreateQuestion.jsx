@@ -131,7 +131,11 @@ const CreateQuestion = () => {
 };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ 
+        mt: 4, 
+        mb: 4 ,
+        background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)'
+        }}>
             <Grid container spacing={3}>
                 {/* Left Sidebar */}
                 <Grid item xs={12} md={3}>
