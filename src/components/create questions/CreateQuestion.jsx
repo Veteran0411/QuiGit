@@ -51,7 +51,8 @@ const CreateQuestion = () => {
                 ...questions[currentQuestionIndex],
             };
         }
-        newQuestions.push({ question: "", options: ["", "", "", ""], correctOptionIndex: null,correctOptionValue:"" });
+        // check where to add players
+        newQuestions.push({ question: "", options: ["", "", "", ""], correctOptionIndex: null,correctOptionValue:""});
         setQuestions(newQuestions);
         setCurrentQuestionIndex(newQuestions.length - 1);
         localStorage.setItem("questions", JSON.stringify(newQuestions));
