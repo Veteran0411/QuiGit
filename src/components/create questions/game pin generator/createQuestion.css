@@ -1,0 +1,143 @@
+/*.create-question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* Three columns with 1:2:1 ratio */
+/* grid-gap: 0; /* No gap between columns */
+/* width: 100%; /* Adjust width as needed */
+/* } */
+*/ */
+
+/* .side-section {
+  background-color: #f0f0f0; 
+
+.question-section {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.question-section .question {
+  margin-bottom: 10px;
+}
+
+.question-section .options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.question-section .option {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+*/ 
+
+/*  */
+
+/* .create-question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: auto 1fr; 
+  width: 80%; 
+}
+
+.question-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.question {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.option {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.button-section {
+  text-align: center;
+  margin-top: 20px;
+} */
+
+
+.createQuestionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-gap: 0;
+  width: 100%;
+  height: calc(100vh - 80px);
+}
+
+.sideSection {
+  background-color: #f0f0f0;
+}
+
+.questionSection {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.questionInput {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.optionInput {
+  flex: 1;
+  width: 100%;
+}
+
+.deleteButton {
+  margin-top: 10px;
+}

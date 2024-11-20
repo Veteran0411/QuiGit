@@ -40,6 +40,7 @@ const JoinGame = () => {
     >
       <Typography variant="h4" gutterBottom>
         Join Game
+        {/* {user.displayName} */}
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
