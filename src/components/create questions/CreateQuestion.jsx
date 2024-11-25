@@ -57,7 +57,9 @@ const CreateQuestion = () => {
             correctOptionIndex: null,
             correctOptionValue: "",
             correctAnswer: "",
-            imagePreview: null
+            imagePreview: null,
+            timeLimit: "",
+            points: ""
         });
         setQuestions(newQuestions);
         setCurrentQuestionIndex(newQuestions.length - 1);
@@ -129,6 +131,14 @@ const CreateQuestion = () => {
         localStorage.setItem("questions", JSON.stringify(newQuestions));
     };
 
+    const handleFieldChange = (questionIndex, fieldName, value) => {
+        const newQuestions = [...questions];
+        newQuestions[questionIndex][fieldName] = value;
+        setQuestions(newQuestions);
+        localStorage.setItem("questions", JSON.stringify(newQuestions));
+    };
+
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         getGamePin();
@@ -138,8 +148,11 @@ const CreateQuestion = () => {
                     !q.question ||
                     (q.type === "mcq" && q.correctOptionIndex === null) ||
                     (q.type === "mcq" && q.options.some((option) => !option)) ||
-                    (q.type === "image" && !q.imagePreview) ||
-                    (q.type === "fill-in-the-blank" && !q.correctAnswer)
+                    // check for options in image type
+                    (q.type === "image" &&  (!q.imagePreview || q.correctOptionIndex === null)) ||
+                    (q.type === "fill-in-the-blank" && !q.correctAnswer) ||
+                    !q.timeLimit ||
+                    !q.points
             )
         ) {
             alert("Please complete all fields before submitting.");
@@ -156,16 +169,29 @@ const CreateQuestion = () => {
 
     return (
         // <Container maxWidth="lg" sx={{ mt: 4, mb: 4, background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)', color: "white" }}>
-            <Grid container
-            
-            // check this spacing
+        <Box
             sx={{
-                background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
-                height:"100%",
-                width:"100%",
-                gap:2,
-                p:2
+                minHeight: '100vh', // Ensures it always covers at least the viewport height
+                width: '100%',      // Full width
+                background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)', // Gradient background
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'column', // Allows content to stack vertically
+                padding: 3,
+                boxSizing: 'border-box',
             }}
+        >
+            <Grid container
+                // check this spacing
+                sx={{
+                    background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
+                    height: "100%",
+                    width: "100%",
+                    gap: 7,
+                    // p: 2
+                }}
             >
                 <Grid item xs={12} md={3} lg={2}>
                     <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
@@ -184,8 +210,8 @@ const CreateQuestion = () => {
                     </Paper>
                 </Grid>
 
-                <Grid item xs={12} md={6} lg={6}>
-                    <Paper elevation={3} sx={{ p: 3, borderRadius: 2,boxSizing:"border-box" }}>
+                <Grid item xs={12} md={6} lg={7}>
+                    <Paper elevation={3} sx={{ p: 3, borderRadius: 2, boxSizing: "border-box" }}>
                         <Typography variant="h5" align="center" gutterBottom>
                             Create Questions
                         </Typography>
@@ -280,16 +306,43 @@ const CreateQuestion = () => {
                                             onChange={(e) => handleCorrectAnswerChange(currentQuestionIndex, e.target.value)}
                                         />
                                     )}
+
+
+                                    {/* check for points options */}
+                                    <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+                                        <TextField
+                                            fullWidth
+                                            label="Time Limit (seconds)"
+                                            type="number"
+                                            value={questions[currentQuestionIndex]?.timeLimit || ""}
+                                            onChange={(e) => handleFieldChange(currentQuestionIndex, "timeLimit", e.target.value)}
+                                            sx={{ mb: 2 }}
+                                        />
+                                        <TextField
+                                            fullWidth
+                                            label="Points"
+                                            type="number"
+                                            value={questions[currentQuestionIndex]?.points || ""}
+                                            onChange={(e) => handleFieldChange(currentQuestionIndex, "points", e.target.value)}
+                                            sx={{ mb: 2 }}
+                                        />
+                                    </Box>
+
                                 </Box>
                             )}
                         </form>
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                color="primary"
-                                onClick={addQuestion}
-                            >
+
+                    </Paper>
+                </Grid>
+
+                <Grid item xs={12} md={3} lg={2}>
+                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
+                        <Typography variant="h6" align="center" gutterBottom>
+                            Submit Quiz
+                        </Typography>
+
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 3 }}>
+                            <Button variant="contained" color="primary" onClick={addQuestion}>
                                 Add Question
                             </Button>
                             <Button
@@ -300,26 +353,14 @@ const CreateQuestion = () => {
                             >
                                 Delete Question
                             </Button>
+                            <Button variant="contained" color="success" onClick={handleSubmit}>
+                                Submit Questions
+                            </Button>
                         </Box>
                     </Paper>
                 </Grid>
-
-                <Grid item xs={12} md={3} lg={2}>
-                    <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-                        <Typography variant="h6" align="center" gutterBottom>
-                            Submit Quiz
-                        </Typography>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            color="success"
-                            onClick={handleSubmit}
-                        >
-                            Submit Questions
-                        </Button>
-                    </Paper>
-                </Grid>
             </Grid>
+        </Box>
         // </Container>
     );
 };
