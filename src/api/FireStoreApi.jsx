@@ -18,26 +18,14 @@ export const createUserCollection=async(email,userName)=>{
     }
 };
 
-// export const createGameCollection=async(email,data)=>{
-//     try{
-//         const docRef=doc(firestore,"games",email);
-//         // makde this object and retain old values
-//         await setDoc(docRef,data);
-//         return true;
-//     }catch(error){
-//         console.log(error,"error while posting details");
-//         return false;
-//     }
-// }
 
-
-
-// generate good gameId and game pin correctly 
+// generate good gameId. 
 export const createGameCollection = async (email, Data) => {
-    const gameId="game3";
+    const gameId="game2";
     const data={
         ...Data,
-        players:[]
+        players:[],
+        isOnline:false
     }
   try {
     const docRef = doc(firestore, "games", email);
