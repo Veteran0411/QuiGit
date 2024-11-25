@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserFromLocalStorage } from "../redux files/slices/authSlice";
+import { useNavigate } from 'react-router-dom';
 
+import Loader from "../common/Loader"
 // Game PIN generator function
 import { generateGamePin } from './game pin generator/gamePinGenerator';
 
@@ -34,6 +36,10 @@ const CreateQuestion = () => {
     const [gamePin, setGamePin] = useState("");
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [loading, setLoading] = useState(false); 
+    // navigate variables
+
+    const navigate=useNavigate();
 
     useEffect(() => {
         dispatch(setUserFromLocalStorage());
@@ -41,6 +47,7 @@ const CreateQuestion = () => {
         if (savedQuestions) {
             setQuestions(savedQuestions);
         }
+        getGamePin();
     }, [dispatch]);
 
     const getGamePin = () => {
@@ -141,15 +148,13 @@ const CreateQuestion = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        getGamePin();
         if (
             questions.some(
                 (q) =>
                     !q.question ||
                     (q.type === "mcq" && q.correctOptionIndex === null) ||
                     (q.type === "mcq" && q.options.some((option) => !option)) ||
-                    // check for options in image type
-                    (q.type === "image" &&  (!q.imagePreview || q.correctOptionIndex === null)) ||
+                    (q.type === "image" && (!q.imagePreview || q.correctOptionIndex === null)) ||
                     (q.type === "fill-in-the-blank" && !q.correctAnswer) ||
                     !q.timeLimit ||
                     !q.points
@@ -163,9 +168,32 @@ const CreateQuestion = () => {
             gamePin: gamePin || "No Game Pin Set",
             questions,
         };
-        await createGameCollection(user.email, submittedData);
-        alert("Questions submitted successfully!");
+
+        setLoading(true); // Show loader
+        try {
+            const res = await createGameCollection(user.email, submittedData);
+            if (res) {
+
+                localStorage.removeItem("questions");
+            
+            // Reset local state if necessary
+                setQuestions([]);
+
+                navigate("/logo");
+            } else {
+                alert("Some error occurred while creating questions.");
+            }
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert("Failed to submit questions.");
+        } finally {
+            setLoading(false); // Hide loader
+        }
     };
+    if (loading) {
+        return <Loader />; // Render loader while loading
+    }
+
 
     return (
         // <Container maxWidth="lg" sx={{ mt: 4, mb: 4, background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)', color: "white" }}>

@@ -34,7 +34,7 @@ export const createUserCollection=async(email,userName)=>{
 
 // generate good gameId and game pin correctly 
 export const createGameCollection = async (email, Data) => {
-    const gameId="game1";
+    const gameId="game3";
     const data={
         ...Data,
         players:[]
