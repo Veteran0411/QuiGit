@@ -21,7 +21,7 @@ export const createUserCollection=async(email,userName)=>{
 
 // generate good gameId. 
 export const createGameCollection = async (email, Data) => {
-    const gameId="game2";
+    const gameId="game3";
     const data={
         ...Data,
         players:[],

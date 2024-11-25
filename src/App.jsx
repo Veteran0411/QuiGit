@@ -7,6 +7,7 @@ import JoinGame from './components/join game/JoinGame';
 import CreateQuestion from './components/create questions/CreateQuestion';
 import UserDetails from './components/user details/UserDetails';
 import Logo from './components/svg/Logo';
+import Test from './components/home/Test';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path='/createQuestion' element={<CreateQuestion/>} />
             <Route path='/userDetails' element={<UserDetails/>} />
             <Route path='/logo' element={<Logo/>} />
+            <Route path='/test' element={<Test/>} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
