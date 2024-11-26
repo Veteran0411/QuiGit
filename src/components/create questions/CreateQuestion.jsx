@@ -68,8 +68,8 @@ const CreateQuestion = () => {
             correctOptionValue: "",
             correctAnswer: "",
             imagePreview: null,
-            timeLimit: "",
-            points: ""
+            timeLimit: 0,
+            points: 0
         });
         setQuestions(newQuestions);
         setCurrentQuestionIndex(newQuestions.length - 1);

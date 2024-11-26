@@ -1,36 +1,49 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { SignOutApi } from "../../api/AuthApi";
 import { setUserFromLocalStorage } from "../redux files/slices/authSlice";
 
+import { toast } from "react-toastify";
+
 
 // mui imports
 import { Box, Button, TextField, Typography } from '@mui/material';
+import { joinGame } from "../../api/FireStoreApi";
 
 const JoinGame = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const user = useSelector((state) => state.auth.user);
 
     const [gamePin, setGamePin] = useState('');
 
     // add logic to check is not authenticated then traverse back to home page
     useEffect(() => {
-        dispatch(setUserFromLocalStorage());
-    }, [dispatch]);
+        if (!user) {
+            dispatch(setUserFromLocalStorage());
+        }
+    }, [dispatch, user]);
 
     const handleInputChange = (event) => {
         setGamePin(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        const res = await joinGame(user.email, gamePin);
+        try{
+            if (res) {
+                toast.success("Joined Game.")
+            } else {
+                toast.dark("Game pin Does not Exists");
+            }
+        }catch(e){
+            console.log("error while joining");
+        }
         // Add logic to handle the game pin submission
-        console.log(`Game pin submitted: ${gamePin}`);
-      };
+    };
 
     return (
         <Box
@@ -41,7 +54,7 @@ const JoinGame = () => {
             minHeight="100vh"
         >
             <Typography variant="h4" gutterBottom>
-                Join Game 
+                Join Game
                 {/* {user.displayName} */}
             </Typography>
             <form onSubmit={handleSubmit}>
@@ -62,7 +75,7 @@ const JoinGame = () => {
                     Submit
                 </Button>
             </form>
-            <div onClick={()=>SignOutApi()}>Signout</div>
+            <div onClick={() => SignOutApi()}>Signout</div>
         </Box>
     )
 }
