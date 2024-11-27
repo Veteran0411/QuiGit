@@ -8,6 +8,7 @@ import CreateQuestion from './components/create questions/CreateQuestion';
 import UserDetails from './components/user details/UserDetails';
 import Logo from './components/svg/Logo';
 import Test from './components/home/Test';
+import AllPlayers from './components/all players join/Allplayers';
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
             <Route path='/joinGame' element={<JoinGame />} />
             <Route path='/createQuestion' element={<CreateQuestion/>} />
             <Route path='/userDetails' element={<UserDetails/>} />
+            <Route path='/allPlayers' element={<AllPlayers/>} />
+
             <Route path='/logo' element={<Logo/>} />
             <Route path='/test' element={<Test/>} />
           </Routes>

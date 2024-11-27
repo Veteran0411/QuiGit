@@ -5,10 +5,13 @@
       getDoc,
       collection,
       updateDoc,
-      arrayUnion
+      arrayUnion,
+      arrayRemove
     } from "firebase/firestore";
 
 import { auth,firestore } from "../firebaseConfig";
+
+import { getDatabase, ref, onDisconnect, set, remove } from "firebase/database";
 
 
 export const createUserCollection=async(email,userName)=>{
@@ -82,7 +85,7 @@ export const createGameCollection = async (email, Data) => {
 };
 
 
-export const joinGame = async (email, gamePin) => {
+export const joinGame = async (email, gamePin,displayName) => {
   try {
     // Reference to the "games" collection
     const gamesCollection = collection(firestore,"games");
@@ -97,11 +100,11 @@ export const joinGame = async (email, gamePin) => {
       // Iterate through each game ID in the document
       for (const [gameId, gameDetails] of Object.entries(gameData)) {
         // Check if the gamePin matches
-        if (String(gameDetails.gamePin) === String(gamePin)) {
+        if (String(gameDetails.gamePin) === String(gamePin) && gameDetails.isOnline===true) {
           // If a match is found, add the player's email to the players array
           const gameRef = doc(firestore, "games", gameDoc.id);
           await updateDoc(gameRef, {
-            [`${gameId}.players`]: arrayUnion(email),
+            [`${gameId}.players`]: arrayUnion({email:email,displayName:displayName}),
           });
 
           return true; // Successfully joined the game
@@ -117,3 +120,59 @@ export const joinGame = async (email, gamePin) => {
   }
 };
 
+
+// modify code later so that display name is displayed on the screen
+export const getAllPlayers=async(email,gamePin)=>{
+  try {
+    // Reference to the "games" collection
+    console.log(email,"getplayer")
+    const gamesCollection = collection(firestore,"games");
+
+    // Fetch all documents in the "games" collection
+    const gamesSnapshot = await getDocs(gamesCollection);
+
+    // Iterate through each document (user's email as document ID)
+    for (const gameDoc of gamesSnapshot.docs) {
+      const gameData = gameDoc.data();
+
+      // Iterate through each game ID in the document
+      for (const [gameId, gameDetails] of Object.entries(gameData)) {
+        // Check if the gamePin matches
+        if (String(gameDetails.gamePin) === String(gamePin)) {
+          return {
+            status:true,
+            details:gameDetails
+          }; // Successfully joined the game
+        }
+      }
+    }
+    // If no matching gamePin is found
+    return false;
+  } catch (error) {
+    console.error("Error while joining game:", error);
+    return false;
+  }
+}
+
+export const trackPlayerStatus = async (email, gamePin, player) => {
+  try {
+    const db = getDatabase(); // Initialize Realtime Database
+    const onlineRef = ref(db, `gameStatus/${gamePin}/${player}`);
+
+    // Mark the player as online in the Realtime Database
+    await set(onlineRef, true);
+
+    // Set a listener to remove the player when they disconnect
+    onDisconnect(onlineRef).remove();
+
+    // Cleanup in Firestore when the player disconnects
+    onDisconnect(onlineRef).then(async () => {
+      const gameDocRef = doc(firestore, "games", email);
+      await updateDoc(gameDocRef, {
+        [`${gamePin}.players`]: arrayRemove(player),
+      });
+    });
+  } catch (error) {
+    console.error("Error setting up online status tracking:", error);
+  }
+};
