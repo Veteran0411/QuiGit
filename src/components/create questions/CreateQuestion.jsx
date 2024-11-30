@@ -192,7 +192,7 @@ const CreateQuestion = () => {
                 // Reset local state if necessary
                 setQuestions([]);
 
-                navigate("/logo");
+                navigate("/dashboard");
             } else {
                 alert("Some error occurred while creating questions.");
             }

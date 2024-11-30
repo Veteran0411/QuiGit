@@ -39,15 +39,15 @@ const JoinGame = () => {
         }
         try {
             const res = await joinGame(user.email, gamePin,user.displayName);
-            if (res) {
-                toast.success("Joined Game.");
+            if (res.status) {
+                toast.success(`${res.message}`);
                 navigate(`/allPlayers?gamePin=${gamePin}`);
             } else {
-                toast.dark("Game is not live yet/ pin does not exist");
+                toast.warn(`${res.message}`);
             }
         } catch (e) {
             console.error("Error while joining game:", e);
-            toast.error("Failed to join game. Please try again.");
+            toast.error(`${res.message}`);
         }
     };
 

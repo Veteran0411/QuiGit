@@ -9,6 +9,8 @@ import UserDetails from './components/user details/UserDetails';
 import Logo from './components/svg/Logo';
 import Test from './components/home/Test';
 import AllPlayers from './components/all players join/Allplayers';
+import DashBoard from './components/dashboard/DashBoard';
+import DisplayQuestions from "./components/display questions/DisplayQuestions"
 
 
 function App() {
@@ -25,8 +27,11 @@ function App() {
             <Route path='/joinGame' element={<JoinGame />} />
             <Route path='/createQuestion' element={<CreateQuestion/>} />
             <Route path='/userDetails' element={<UserDetails/>} />
+            <Route path='/dashboard' element={<DashBoard/>} />
             <Route path='/allPlayers' element={<AllPlayers/>} />
+            <Route path='/displayQuestions' element={<DisplayQuestions/>} />
 
+            
             <Route path='/logo' element={<Logo/>} />
             <Route path='/test' element={<Test/>} />
           </Routes>

@@ -1,10 +1,10 @@
 import { onAuthStateChanged } from 'firebase/auth';
-import React from 'react'
+import React from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch,useSelector } from 'react-redux';
-import { Button, Box, Typography,Grid } from '@mui/material';
-import pcImg from"../../assets/pc.png";
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, Box, Typography, Grid } from '@mui/material';
+import pcImg from "../../assets/pc.png";
 
 // firestore.jsx imports
 import { createUserCollection } from '../../api/FireStoreApi';
@@ -13,30 +13,33 @@ import { createUserCollection } from '../../api/FireStoreApi';
 // import { auth } from '../../firebaseConfig';
 
 const CreateOrJoin = () => {
-
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // onAuthStateChanged(auth,res=>{console.log(res)})
-    if(!user){
+    if (!user) {
       dispatch(setUserFromLocalStorage());
     }
-  }, [dispatch,user]);
+  }, [dispatch, user]);
 
-  const handleCreate = async() => {
-    const status=await createUserCollection(user.email,user.displayName);
-    if(status){
+  const handleCreate = async () => {
+    const status = await createUserCollection(user.email, user.displayName);
+    if (status) {
       navigate("/createQuestion");
     }
   };
 
-  const handleJoin = async() => {
-    const status=await createUserCollection(user.email,user.displayName);
-    if(status){
-      navigate("/joinGame")
+  const handleJoin = async () => {
+    const status = await createUserCollection(user.email, user.displayName);
+    if (status) {
+      navigate("/joinGame");
     }
+  };
+
+  const handleDashboard = () => {
+    navigate("/dashboard");
   };
 
   return (
@@ -60,13 +63,14 @@ const CreateOrJoin = () => {
             {/* {user.displayName} */}
           </Typography>
           <Typography variant="body1" sx={{ maxWidth: 500, mb: 3, mx: 'auto' }}>
-          Get ready to play, learn, and enjoy! Test your skills with engaging quizzes and challenge your friends as you embark on an exciting journey of knowledge.
+            Get ready to play, learn, and enjoy! Test your skills with engaging quizzes and challenge your friends as you embark on an exciting journey of knowledge.
           </Typography>
           <Box
             sx={{
               display: 'flex',
               gap: 2,
               justifyContent: 'center', // Center-aligns buttons
+              flexWrap: 'wrap', // Allows wrapping of buttons
             }}
           >
             <Button
@@ -100,6 +104,22 @@ const CreateOrJoin = () => {
             >
               Join Now
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleDashboard}
+              sx={{
+                backgroundColor: '#ff9800',
+                color: 'white',
+                fontWeight: 'bold',
+                padding: '10px 20px',
+                '&:hover': {
+                  backgroundColor: '#e68900',
+                },
+              }}
+            >
+              Go to Dashboard
+            </Button>
           </Box>
         </Grid>
 
@@ -120,7 +140,7 @@ const CreateOrJoin = () => {
         </Grid>
       </Grid>
     </Box>
-  )
-}
+  );
+};
 
-export default CreateOrJoin
+export default CreateOrJoin;
