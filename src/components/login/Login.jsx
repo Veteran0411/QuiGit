@@ -138,7 +138,7 @@ const Login = () => {
         onAuthStateChanged(auth, (res) => {
             if (res?.accessToken && res.emailVerified) {
                 setLoading(false);
-                console.log(res)
+                // console.log(res)
                 // create home page to navigate
                 // remove set loading and use store and actions to store user details in redux files
                 navigate("/home");

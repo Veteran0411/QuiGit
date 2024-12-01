@@ -67,6 +67,7 @@ export const createGameCollection = async (email, Data) => {
       createdBy:email,
       isOnline: false,
       currentPage:"",// can modify page to questions
+      currentQuestion:0,
       date, // Adding date
       time, // Adding time
     };

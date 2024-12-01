@@ -11,6 +11,7 @@ import Test from './components/home/Test';
 import AllPlayers from './components/all players join/Allplayers';
 import DashBoard from './components/dashboard/DashBoard';
 import DisplayQuestions from "./components/display questions/DisplayQuestions"
+import LeaderBoard from './components/leaderboard/LeaderBoard';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path='/dashboard' element={<DashBoard/>} />
             <Route path='/allPlayers' element={<AllPlayers/>} />
             <Route path='/displayQuestions' element={<DisplayQuestions/>} />
+            <Route path='/leaderBoard' element={<LeaderBoard/>} />
 
             
             <Route path='/logo' element={<Logo/>} />
