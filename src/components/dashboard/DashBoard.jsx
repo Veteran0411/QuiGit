@@ -142,6 +142,7 @@ const Dashboard = () => {
                                     color: "#fff",
                                     marginTop: "0.5rem",
                                 }}
+                                onClick={()=>{navigate("/userDetails")}}
                             >
                                 Edit
                             </Button>

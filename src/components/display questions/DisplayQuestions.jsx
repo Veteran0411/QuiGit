@@ -167,31 +167,35 @@ const DisplayQuestions = () => {
         setIsSubmitted(true); // Disable further submissions
     
         // Display success or failure message based on correctness
-        if (isCorrect) {
-            toast.success("Correct Answer!");
-        } else {
-            toast.error("Wrong Answer!");
-        }
+        toast.success("Answer submitted");
     
         try {
             // Create or update the leaderboard document
             const leaderboardDocRef = doc(firestore, "leaderboard", gamePin); // Assume 'leaderboard' collection tracks scores
-            const playerDataPath = `players.${user.email}`; // Corrected path to the player's data using email as the unique ID
+            const playerDataPath = `players.${user.email}`; // Path to the player's data using email as the unique ID
     
             // Ensure points are stored as numbers (default to 0 if not available)
             const points = Number(currentQuestion.points) || 0;
     
-            // Retrieve the current player data to merge the new score with previous data
+            // Retrieve the current leaderboard data
             const playerDoc = await getDoc(leaderboardDocRef);
-            const currentPlayerData = playerDoc.exists() ? playerDoc.data().players?.[user.email] : null;
+            const leaderboardData = playerDoc.exists() ? playerDoc.data() : {};
+            const currentPlayerData = leaderboardData.players?.[user.email] || {};
     
-            const currentQuestions = currentPlayerData?.questions || {};
-            const currentTotalScore = currentPlayerData?.totalScore || 0;
+            const currentQuestions = currentPlayerData.questions || {};
+            const currentTotalScore = currentPlayerData.totalScore || 0;
+            const hasCompleted = currentPlayerData.hasCompleted || false;
+    
+            // Do not update scores if the player has already completed the game
+            if (hasCompleted) {
+                toast.warning("You have already completed the game. Scores cannot be updated.");
+                return;
+            }
     
             // Update the questions and total score
             const updatedQuestions = {
                 ...currentQuestions,
-                [currentQuestionIndex]: isCorrect ? points : 0, // Update the current question's score
+                [currentQuestion.question]: isCorrect ? points : 0, // Store the question as the key with its points
             };
     
             const updatedTotalScore = currentTotalScore + (isCorrect ? points : 0); // Increment total score
@@ -202,18 +206,16 @@ const DisplayQuestions = () => {
                 {
                     players: {
                         [user.email]: {
-                            questions: updatedQuestions, // Merge new question score
+                            questions: updatedQuestions, // Store the question and its score
                             totalScore: updatedTotalScore, // Update the total score
                             displayName: user.displayName || "Anonymous", // Store player's display name
+                            hasCompleted: currentQuestionIndex >= questions.length - 1, // Mark the player as completed if it's the last question
                         },
                     },
                 },
                 { merge: true } // Merge updates into the document
             );
-    
-            console.log("Score updated successfully!");
         } catch (error) {
-            console.error("Error updating score:", error);
             toast.error("Failed to update score.");
         }
     
