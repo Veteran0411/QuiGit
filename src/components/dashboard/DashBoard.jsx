@@ -142,13 +142,13 @@ const Dashboard = () => {
                                     color: "#fff",
                                     marginTop: "0.5rem",
                                 }}
-                                onClick={()=>{navigate("/userDetails")}}
+                                onClick={() => { navigate("/userDetails") }}
                             >
                                 Edit
                             </Button>
                         </Box>
                     </ProfileCard>
-    
+
                     {/* Games Online Section */}
                     <LeaderboardCard sx={{ marginTop: "1rem" }}>
                         <Typography variant="h6" sx={{ marginBottom: "1rem" }}>
@@ -177,6 +177,16 @@ const Dashboard = () => {
                                                 </Typography>
                                                 <Typography>Game PIN: {game.gamePin}</Typography>
                                             </CardContent>
+                                            <CardActions>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    sx={{ backgroundColor: "#3498db", color: "#fff" }}
+                                                    onClick={() => navigate(`/leaderBoard?gamePin=${game.gamePin}`)}
+                                                >
+                                                    View Leaderboard
+                                                </Button>
+                                            </CardActions>
                                         </Card>
                                     </Grid>
                                 ))}
@@ -185,8 +195,9 @@ const Dashboard = () => {
                             <Typography>No online games found.</Typography>
                         )}
                     </LeaderboardCard>
+
                 </Grid>
-    
+
                 {/* Games Pending Section */}
                 <Grid item xs={12} md={8}>
                     <LeaderboardCard>
@@ -246,7 +257,7 @@ const Dashboard = () => {
             </Grid>
         </Box>
     );
-    
+
 };
 
 export default Dashboard;
