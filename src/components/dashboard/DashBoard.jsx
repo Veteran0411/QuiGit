@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { startGame, deleteGame } from "../../api/FireStoreApi";
 import { firestore } from "../../firebaseConfig";
 import { doc, onSnapshot } from "firebase/firestore";
+import NavigationBar from "../navbar/NavigationBar";
 
 const ProfileCard = styled(Box)(({ theme }) => ({
     backgroundColor: "#22303c",
@@ -103,6 +104,7 @@ const Dashboard = () => {
 
     return (
         <Box sx={{ backgroundColor: "#11202e", minHeight: "100vh", padding: "1rem" }}>
+            <NavigationBar/>
             <Grid container spacing={3}>
                 {/* Profile Section */}
                 <Grid item xs={12} md={4}>
@@ -151,11 +153,11 @@ const Dashboard = () => {
 
                     {/* Games Online Section */}
                     <LeaderboardCard sx={{
-        marginTop: "1rem",
-        maxHeight: "300px",
-        overflowY: "auto",
-        scrollbarWidth: "thin",
-    }}>
+                        marginTop: "1rem",
+                        maxHeight: "300px",
+                        overflowY: "auto",
+                        scrollbarWidth: "thin",
+                    }}>
                         <Typography variant="h6" sx={{ marginBottom: "1rem" }}>
                             Games Completed
                         </Typography>

@@ -7,6 +7,7 @@ import { Box, Typography, Grid, Paper, CircularProgress, Button, Stack } from "@
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import NavigationBar from "../navbar/NavigationBar";
 
 const LeaderBoard = () => {
   const location = useLocation();
@@ -110,6 +111,7 @@ const LeaderBoard = () => {
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#1c1c1c", minHeight: "100vh" }}>
+      <NavigationBar/>
       <Box
         sx={{
           display: "flex",

@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { keyframes } from "@mui/system";
 import { joinGame } from "../../api/FireStoreApi";
+import NavigationBar from "../navbar/NavigationBar";
 
 // Animation for the card
 const fadeInUp = keyframes`
@@ -98,6 +99,7 @@ const JoinGame = () => {
                 padding: 4,
             }}
         >
+            <NavigationBar/>
             <Paper
                 elevation={6}
                 sx={{
