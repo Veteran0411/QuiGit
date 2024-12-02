@@ -150,7 +150,12 @@ const Dashboard = () => {
                     </ProfileCard>
 
                     {/* Games Online Section */}
-                    <LeaderboardCard sx={{ marginTop: "1rem" }}>
+                    <LeaderboardCard sx={{
+        marginTop: "1rem",
+        maxHeight: "300px",
+        overflowY: "auto",
+        scrollbarWidth: "thin",
+    }}>
                         <Typography variant="h6" sx={{ marginBottom: "1rem" }}>
                             Games Completed
                         </Typography>
@@ -195,6 +200,7 @@ const Dashboard = () => {
                             <Typography>No online games found.</Typography>
                         )}
                     </LeaderboardCard>
+
 
                 </Grid>
 
