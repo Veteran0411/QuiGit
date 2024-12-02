@@ -12,7 +12,7 @@
     } from "firebase/firestore";
 
 import { auth,firestore } from "../firebaseConfig";
-
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { getDatabase, ref, onDisconnect, set, remove } from "firebase/database";
 
 
@@ -338,3 +338,18 @@ export const updateCurrentPageAttribute = async (email, gamePin, page) => {
   }
 };
 
+export const forgotPasswordCall = async (email) => {
+  try {
+      await sendPasswordResetEmail(auth, email);
+      return {
+          success: true,
+          message: 'Password reset email sent successfully.',
+      };
+  } catch (error) {
+      console.error("Error sending password reset email:", error.message);
+      return {
+          success: false,
+          error: error.message,
+      };
+  }
+};
