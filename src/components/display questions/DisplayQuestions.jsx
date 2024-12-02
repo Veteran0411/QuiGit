@@ -11,7 +11,7 @@ import {
     TextField,
     Button,
 } from "@mui/material";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc,setDoc, onSnapshot, updateDoc,increment } from "firebase/firestore";
 import { firestore } from "../../fireBaseConfig";
 import { toast } from "react-toastify";
 
@@ -29,6 +29,7 @@ const DisplayQuestions = () => {
     const [timer, setTimer] = useState(null); // Timer for the question
     const [playerAnswer, setPlayerAnswer] = useState(""); // Player's answer
     const [isSubmitted, setIsSubmitted] = useState(false); // To track if player has submitted their answer
+    const [points,setPoints]=useState(0);
 
     useEffect(() => {
         if (!user || !gamePin) return;
@@ -72,7 +73,7 @@ const DisplayQuestions = () => {
                 // Check if the game has ended (no more questions)
                 if (gameDetails.currentQuestion >= gameDetails.questions.length) {
                     toast.success("Game Complete");
-                    navigate("/leaderBoard"); // Navigate for all players
+                    navigate(`/leaderBoard?gamePin=${gamePin}`);
                 }
                 break;
             }
@@ -133,7 +134,7 @@ const DisplayQuestions = () => {
                         } else {
                             // Navigate both host and players to the leaderboard
                             toast.success("game Complete");
-                            navigate("/leaderBoard");
+                            navigate(`/leaderBoard?gamePin=${gamePin}`);
                         }
                         break;
                     }
@@ -148,35 +149,81 @@ const DisplayQuestions = () => {
         setPlayerAnswer(e.target.value);
     };
 
-    const handleSubmitAnswer = () => {
+    const handleSubmitAnswer = async () => {
         const currentQuestion = questions[currentQuestionIndex];
         let isCorrect = false;
-
+    
+        // Check if the answer is correct
         if (currentQuestion.type === "mcq" || currentQuestion.type === "image") {
-            // Check if the selected option is the correct one
             if (playerAnswer === currentQuestion.correctOptionValue) {
                 isCorrect = true;
             }
         } else if (currentQuestion.type === "fill-in-the-blank") {
-            // Check if the answer matches the correct one
             if (playerAnswer.toLowerCase() === currentQuestion.correctAnswer.toLowerCase()) {
                 isCorrect = true;
             }
         }
-
+    
         setIsSubmitted(true); // Disable further submissions
-        if(currentQuestionIndex>=questions.length-1){
-            toast.success("game completed")
-            navigate("/dashBoard");
-
-        }
+    
+        // Display success or failure message based on correctness
         if (isCorrect) {
             toast.success("Correct Answer!");
         } else {
             toast.error("Wrong Answer!");
         }
-        
+    
+        try {
+            // Create or update the leaderboard document
+            const leaderboardDocRef = doc(firestore, "leaderboard", gamePin); // Assume 'leaderboard' collection tracks scores
+            const playerDataPath = `players.${user.email}`; // Corrected path to the player's data using email as the unique ID
+    
+            // Ensure points are stored as numbers (default to 0 if not available)
+            const points = Number(currentQuestion.points) || 0;
+    
+            // Retrieve the current player data to merge the new score with previous data
+            const playerDoc = await getDoc(leaderboardDocRef);
+            const currentPlayerData = playerDoc.exists() ? playerDoc.data().players?.[user.email] : null;
+    
+            const currentQuestions = currentPlayerData?.questions || {};
+            const currentTotalScore = currentPlayerData?.totalScore || 0;
+    
+            // Update the questions and total score
+            const updatedQuestions = {
+                ...currentQuestions,
+                [currentQuestionIndex]: isCorrect ? points : 0, // Update the current question's score
+            };
+    
+            const updatedTotalScore = currentTotalScore + (isCorrect ? points : 0); // Increment total score
+    
+            // Set or update the player data correctly within the 'players' object
+            await setDoc(
+                leaderboardDocRef,
+                {
+                    players: {
+                        [user.email]: {
+                            questions: updatedQuestions, // Merge new question score
+                            totalScore: updatedTotalScore, // Update the total score
+                            displayName: user.displayName || "Anonymous", // Store player's display name
+                        },
+                    },
+                },
+                { merge: true } // Merge updates into the document
+            );
+    
+            console.log("Score updated successfully!");
+        } catch (error) {
+            console.error("Error updating score:", error);
+            toast.error("Failed to update score.");
+        }
+    
+        // If it's the last question, navigate to the dashboard
+        if (currentQuestionIndex >= questions.length - 1) {
+            toast.success("Game completed");
+            navigate("/dashBoard");
+        }
     };
+    
 
     if (questions.length === 0) {
         return (
