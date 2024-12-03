@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { firestore } from "../../fireBaseConfig";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { Box, Typography, Grid, Paper, CircularProgress, Button, Stack } from "@mui/material";
 import * as XLSX from "xlsx";
@@ -18,7 +18,7 @@ const LeaderBoard = () => {
   const queryParams = new URLSearchParams(location.search);
   const gamePin = queryParams.get("gamePin");
 
-  // Fetch leaderboard data in real-time
+  // Fetch leaderboard data and USN in real-time
   useEffect(() => {
     if (!gamePin) {
       toast.error("Game Pin not found!");
@@ -27,20 +27,36 @@ const LeaderBoard = () => {
 
     const leaderboardDocRef = doc(firestore, "leaderboard", gamePin);
 
-    const unsubscribe = onSnapshot(leaderboardDocRef, (docSnapshot) => {
+    const unsubscribe = onSnapshot(leaderboardDocRef, async (docSnapshot) => {
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
         const playersData = data.players || {};
 
-        const leaderboard = Object.keys(playersData).map((email) => {
-          const player = playersData[email];
-          return {
-            email,
-            displayName: player.displayName || "Anonymous",
-            totalScore: player.totalScore || 0,
-            questions: player.questions || {},
-          };
-        });
+        const leaderboard = await Promise.all(
+          Object.keys(playersData).map(async (email) => {
+            const player = playersData[email];
+            let usn = "N/A";
+
+            // Fetch USN from the users collection
+            try {
+              const userDocRef = doc(firestore, "users", email);
+              const userDoc = await getDoc(userDocRef);
+              if (userDoc.exists()) {
+                usn = userDoc.data().usn || "N/A";
+              }
+            } catch (err) {
+              console.error(`Error fetching USN for ${email}:`, err);
+            }
+
+            return {
+              email,
+              displayName: player.displayName || "Anonymous",
+              totalScore: player.totalScore || 0,
+              usn,
+              questions: player.questions || {},
+            };
+          })
+        );
 
         leaderboard.sort((a, b) => b.totalScore - a.totalScore);
         setLeaderboardData(leaderboard);
@@ -63,6 +79,7 @@ const LeaderBoard = () => {
       return {
         Name: player.displayName,
         Email: player.email,
+        USN: player.usn,
         TotalScore: player.totalScore,
         ...Object.assign({}, ...questionScores),
       };
@@ -77,11 +94,12 @@ const LeaderBoard = () => {
   // Function to generate and download the PDF report
   const downloadPdfReport = () => {
     const doc = new jsPDF();
-    const tableColumnHeaders = ["Name", "Email", "Total Score"];
+    const tableColumnHeaders = ["Name", "Email", "USN", "Total Score"];
     const tableRows = leaderboardData.map((player) => {
       const rowData = [
         player.displayName,
         player.email,
+        player.usn,
         player.totalScore,
         // Add scores for each question dynamically if needed
         ...Object.keys(player.questions || {}).map(
@@ -177,6 +195,12 @@ const LeaderBoard = () => {
                     sx={{ color: "#9e9e9e", fontStyle: "italic" }}
                   >
                     {player.email}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "#9e9e9e", fontStyle: "italic" }}
+                  >
+                    USN: {player.usn}
                   </Typography>
                 </Box>
                 <Typography

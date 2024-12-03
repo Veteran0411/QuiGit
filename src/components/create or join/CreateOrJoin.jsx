@@ -24,22 +24,25 @@ const CreateOrJoin = () => {
     }
   }, [dispatch, user]);
 
-  const handleCreate = async () => {
-    const status = await createUserCollection(user.email, user.displayName);
-    if (status) {
-      navigate("/createQuestion");
-    }
+  const handleCreate =  () => {
+    // const status = await createUserCollection(user.email, user.displayName);
+    // if (status) {
+    // }
+    navigate("/createQuestion");
   };
 
-  const handleJoin = async () => {
-    const status = await createUserCollection(user.email, user.displayName);
-    if (status) {
-      navigate("/joinGame");
-    }
+  const handleJoin =  () => {
+    // const status = await createUserCollection(user.email, user.displayName);
+    // if (status) {
+    // }
+    navigate("/joinGame");
   };
 
-  const handleDashboard = () => {
+  const handleDashboard =() => {
+    // const status = await createUserCollection(user.email, user.displayName);
     navigate("/dashboard");
+    // if(status){
+    // }
   };
 
   return (

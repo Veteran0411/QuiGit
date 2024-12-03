@@ -16,14 +16,15 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { getDatabase, ref, onDisconnect, set, remove } from "firebase/database";
 
 
-export const createUserCollection=async(email,userName)=>{
+export const createUserCollection=async(email,userName,usn)=>{
     const data={
         userName:userName,
         email:email,
         gamesCreated:[],
         gamesPlayed: 0,
         totalScore:0,
-        lastGameId:""
+        lastGameId:"",
+        usn:usn
     }
     try{
         const docRef=doc(firestore,"users",email);
@@ -37,6 +38,7 @@ export const createUserCollection=async(email,userName)=>{
 
 
 // test game id
+
 export const createGameCollection = async (email, Data) => {
   try {
     const docRef = doc(firestore, "games", email);
@@ -54,7 +56,8 @@ export const createGameCollection = async (email, Data) => {
 
     // Replace periods (.) in the email with underscores (_) for gameId
     const sanitizedEmail = email.replace(/\./g, "_"); // Replaces all periods with underscores
-    const gameId = `${sanitizedEmail}-${count}`; // Create the game ID with sanitized email
+    const timeStamp = Date.now(); // Current timestamp for uniqueness
+    const gameId = `${sanitizedEmail}-${timeStamp}-${count}`; // Create the game ID with sanitized email and timestamp
 
     const now = new Date();
     const date = now.toISOString().split("T")[0]; // Format: YYYY-MM-DD
@@ -64,10 +67,10 @@ export const createGameCollection = async (email, Data) => {
     const data = {
       ...Data,
       players: [],
-      createdBy:email,
+      createdBy: email,
       isOnline: false,
-      currentPage:"",// can modify page to questions
-      currentQuestion:0,
+      currentPage: "", // can modify page to questions
+      currentQuestion: 0,
       date, // Adding date
       time, // Adding time
     };
@@ -91,6 +94,7 @@ export const createGameCollection = async (email, Data) => {
     return false;
   }
 };
+
 
 
 export const joinGame = async (email, gamePin,displayName) => {

@@ -17,7 +17,7 @@ import { setUserFromLocalStorage } from "../redux files/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { startGame, deleteGame } from "../../api/FireStoreApi";
 import { firestore } from "../../firebaseConfig";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import NavigationBar from "../navbar/NavigationBar";
 
 const ProfileCard = styled(Box)(({ theme }) => ({
@@ -44,6 +44,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const user = useSelector((state) => state.auth.user);
     const [games, setGames] = useState([]);
+    const [usn, setUsn] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -51,6 +52,27 @@ const Dashboard = () => {
             dispatch(setUserFromLocalStorage());
         }
     }, [dispatch, user]);
+
+    useEffect(() => {
+        if (!user?.email) return;
+
+        const fetchUserDetails = async () => {
+            try {
+                const docRef = doc(firestore, "users", user.email);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setUsn(docSnap.data().usn || "Not Provided");
+                } else {
+                    console.warn("No such document for user!");
+                }
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            }
+        };
+
+        fetchUserDetails();
+    }, [user?.email]);
 
     useEffect(() => {
         if (!user?.email) return;
@@ -73,7 +95,7 @@ const Dashboard = () => {
 
     const handleStartGame = async (gamePin, gameId) => {
         try {
-            toast.success("Loading game")
+            toast.success("Loading game");
             const res = await startGame(user.email, gamePin, gameId);
             if (res.success) {
                 navigate(`/allPlayers?gamePin=${gamePin}`);
@@ -104,7 +126,7 @@ const Dashboard = () => {
 
     return (
         <Box sx={{ backgroundColor: "#11202e", minHeight: "100vh", padding: "1rem" }}>
-            <NavigationBar/>
+            <NavigationBar />
             <Grid container spacing={3}>
                 {/* Profile Section */}
                 <Grid item xs={12} md={4}>
@@ -137,6 +159,7 @@ const Dashboard = () => {
                             </Box>
                             <Typography>Name: {user?.displayName || "Unknown"}</Typography>
                             <Typography>Email: {user?.email || "Unknown"}</Typography>
+                            <Typography>USN: {usn || "Fetching..."}</Typography>
                             <Button
                                 variant="contained"
                                 sx={{
@@ -144,7 +167,9 @@ const Dashboard = () => {
                                     color: "#fff",
                                     marginTop: "0.5rem",
                                 }}
-                                onClick={() => { navigate("/userDetails") }}
+                                onClick={() => {
+                                    navigate("/userDetails");
+                                }}
                             >
                                 Edit
                             </Button>
@@ -152,12 +177,14 @@ const Dashboard = () => {
                     </ProfileCard>
 
                     {/* Games Online Section */}
-                    <LeaderboardCard sx={{
-                        marginTop: "1rem",
-                        maxHeight: "300px",
-                        overflowY: "auto",
-                        scrollbarWidth: "thin",
-                    }}>
+                    <LeaderboardCard
+                        sx={{
+                            marginTop: "1rem",
+                            maxHeight: "300px",
+                            overflowY: "auto",
+                            scrollbarWidth: "thin",
+                        }}
+                    >
                         <Typography variant="h6" sx={{ marginBottom: "1rem" }}>
                             Games Completed
                         </Typography>
@@ -193,7 +220,16 @@ const Dashboard = () => {
                                                 >
                                                     View Leaderboard
                                                 </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    sx={{ backgroundColor: "#16a085", color: "#fff" }}
+                                                    onClick={() => navigate(`/seeQuiz?gamePin=${game.gamePin}`)}
+                                                >
+                                                    See Quiz
+                                                </Button>
                                             </CardActions>
+
                                         </Card>
                                     </Grid>
                                 ))}
@@ -202,8 +238,6 @@ const Dashboard = () => {
                             <Typography>No online games found.</Typography>
                         )}
                     </LeaderboardCard>
-
-
                 </Grid>
 
                 {/* Games Pending Section */}
@@ -252,6 +286,14 @@ const Dashboard = () => {
                                                 >
                                                     Delete Game
                                                 </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    sx={{ backgroundColor: "#16a085", color: "#fff" }}
+                                                    onClick={() => navigate(`/seeQuiz?gamePin=${game.gamePin}`)}
+                                                >
+                                                    See Quiz
+                                                </Button>
                                             </CardActions>
                                         </Card>
                                     </Grid>
@@ -265,7 +307,6 @@ const Dashboard = () => {
             </Grid>
         </Box>
     );
-
 };
 
 export default Dashboard;

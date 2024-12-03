@@ -12,6 +12,7 @@ import AllPlayers from './components/all players join/Allplayers';
 import DashBoard from './components/dashboard/DashBoard';
 import DisplayQuestions from "./components/display questions/DisplayQuestions"
 import LeaderBoard from './components/leaderboard/LeaderBoard';
+import SeeQuiz from './components/see quiz/SeeQuiz';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path='/allPlayers' element={<AllPlayers/>} />
             <Route path='/displayQuestions' element={<DisplayQuestions/>} />
             <Route path='/leaderBoard' element={<LeaderBoard/>} />
+            <Route path='/seeQuiz' element={<SeeQuiz/>} />
 
             
             <Route path='/logo' element={<Logo/>} />
