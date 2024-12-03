@@ -186,7 +186,7 @@ const Dashboard = () => {
                         }}
                     >
                         <Typography variant="h6" sx={{ marginBottom: "1rem" }}>
-                            Games Completed
+                            Games Hosted
                         </Typography>
                         {loading ? (
                             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "150px" }}>
