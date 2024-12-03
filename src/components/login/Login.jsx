@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Box, Grid, Hidden, InputBase, styled, Typography } from '@mui/material'
 import { toast } from "react-toastify";
 import { LoginApi, RegisterApi, SignOutApi } from '../../api/AuthApi';
@@ -9,10 +9,10 @@ import { forgotPasswordCall } from '../../api/FireStoreApi';
 //icons
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { onAuthStateChanged} from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import Loader from '../common/Loader';
 import { auth } from '../../firebaseConfig';
-import { useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import BlobSvg from '../svg/BlobSvg';
 import "./login.css"
 
@@ -132,8 +132,8 @@ const Login = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [loading, setLoading] = useState(true);
-    const [forgotEmail,setForgotEmail]=useState("");
-    const [isForgotPassword,setForgotPassword]=useState(false);
+    const [forgotEmail, setForgotEmail] = useState("");
+    const [isForgotPassword, setForgotPassword] = useState(false);
 
     // navigate object
     const navigate = useNavigate();
@@ -166,33 +166,39 @@ const Login = () => {
 
     const validateForm = async (e) => {
         e.preventDefault();
-    
+
         // Email regex
         const emailRegex = /^.+\.git\.edu$/;
-    
+
         // Password regex
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
-    
+
         if (isSignUp) {
             try {
                 const emailValid = emailRegex.test(signUpValues.email);
                 const passwordValid = passwordRegex.test(signUpValues.password);
-    
+
                 if (!emailValid) {
                     toast.error("Invalid email. use College email");
                     return;
                 }
-                
+
                 if (!passwordValid) {
                     toast.warning("Password should be at least 8 characters long and contain upper case, lower case, and special characters.");
                     return;
                 }
-    
+
+                const emailUsername = signUpValues.email.split("-t")[0]; // Extract username part of the email
+                if (signUpValues.password.includes(emailUsername)) {
+                    toast.error("Password should not contain part of your email.");
+                    return;
+                }
+
                 if (signUpValues.password !== signUpValues.confirmPassword) {
                     toast.error("Passwords didn't match.");
                     return;
                 }
-    
+
                 let res = await RegisterApi(signUpValues.email, signUpValues.password);
                 if (res.success) {
                     setLoginValues(loginInitialValues);
@@ -211,17 +217,17 @@ const Login = () => {
             try {
                 const emailValid = emailRegex.test(loginValues.email);
                 const passwordValid = passwordRegex.test(loginValues.password);
-    
+
                 if (!emailValid) {
                     toast.error("Invalid email. Use college Email");
                     return;
                 }
-    
+
                 if (!passwordValid) {
                     toast.error("Invalid password.");
                     return;
                 }
-    
+
                 let res = await LoginApi(loginValues.email, loginValues.password);
                 if (!res.user.emailVerified) {
                     toast.warning("Email verification pending.");
@@ -231,7 +237,7 @@ const Login = () => {
                     toast.success("Login successful, navigate now.");
                     console.log("navigating inside login call");
                     navigate("/home");
-                
+
                 }
             } catch (err) {
                 toast.error("Invalid credentials.");
@@ -243,12 +249,12 @@ const Login = () => {
         e.preventDefault();
         const emailRegex = /^.+\.git\.edu$/;
         const emailValid = emailRegex.test(forgotEmail);
-    
+
         if (!emailValid) {
             toast.error("Invalid email. Use college email");
             return;
         }
-    
+
         const response = await forgotPasswordCall(forgotEmail);
         if (response.success) {
             toast.success(response.message);
@@ -258,110 +264,110 @@ const Login = () => {
             toast.error(response.error);
         }
     };
-    
 
-return (
-    loading ? <Loader /> :
-        <GridContainer container>
-            <LogoContainer item lg={6} md={12} style={{position:"relative"}}>
-                <Hidden mdDown>
-                    QuiG!t
-                </Hidden>
-            </LogoContainer>
 
-            <CardContainer container item lg={6} xs={12} md={12}>
+    return (
+        loading ? <Loader /> :
+            <GridContainer container>
+                <LogoContainer item lg={6} md={12} style={{ position: "relative" }}>
+                    <Hidden mdDown>
+                        QuiG!t
+                    </Hidden>
+                </LogoContainer>
 
-                <Card item lg={6} xs={10} md={10}>
+                <CardContainer container item lg={6} xs={12} md={12}>
 
-                    {
-                        isForgotPassword?<>
-                        <FormHeader>Forgot Password</FormHeader>
-                        <Form onSubmit={(e) => handleForgotPassword(e)} >
-                            <Input placeholder="Enter your email" name='email' type='email' onChange={(e)=>setForgotEmail(e.target.value)}  required autoComplete='off' value={forgotEmail}/>
-                            <Input type='submit' sx={{
+                    <Card item lg={6} xs={10} md={10}>
+
+                        {
+                            isForgotPassword ? <>
+                                <FormHeader>Forgot Password</FormHeader>
+                                <Form onSubmit={(e) => handleForgotPassword(e)} >
+                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => setForgotEmail(e.target.value)} required autoComplete='off' value={forgotEmail} />
+                                    <Input type='submit' sx={{
+                                        cursor: 'pointer',
+                                        backgroundColor: "white",
+                                        color: 'black',
+                                        fontWeight: "700",
+                                        padding: "0.3rem",
+                                        borderRadius: "5px",
+                                    }} value="send Link" />
+
+                                </Form>
+                            </>
+                                : <>
+                                    <FormHeader>{isSignUp ? "Sign up" : "Login"}</FormHeader>
+                                    <Form onSubmit={(e) => validateForm(e)} >
+                                        {
+                                            isSignUp ?
+                                                <>
+                                                    {/* <Input placeholder="Enter your name" name="name" type='text' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.name} required /> */}
+                                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.email} required autoComplete='off' />
+                                                    <IconContainer>
+                                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.password} required autoComplete='off' />
+                                                        <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
+                                                            {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                                        </Icon>
+                                                    </IconContainer>
+                                                    <Input placeholder="Confirm your password" name="confirmPassword" type='password' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.confirmPassword} required autoComplete='off' />
+                                                    <Input type='submit' sx={{
+                                                        cursor: 'pointer',
+                                                        backgroundColor: "white",
+                                                        color: 'black',
+                                                        fontWeight: "700",
+                                                        padding: "0.3rem",
+                                                        borderRadius: "5px",
+                                                    }}
+                                                    />
+                                                </>
+                                                :
+                                                <>
+                                                    <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'login')} value={loginValues.email} required autoComplete='off' />
+
+                                                    <IconContainer>
+                                                        <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'login')} value={loginValues.password} required autoComplete='off' />
+                                                        <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
+                                                            {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                                        </Icon>
+                                                    </IconContainer>
+                                                    <Input type='submit' sx={{
+                                                        cursor: 'pointer',
+                                                        backgroundColor: "white",
+                                                        color: 'black',
+                                                        fontWeight: "700",
+                                                        padding: "0.3rem",
+                                                        borderRadius: "5px",
+                                                    }} />
+                                                </>
+                                        }
+                                    </Form>
+                                    <SignUpLabel onClick={() => toggleSignUpLabel()}>
+                                        <Box sx={{
+                                            // color: 'black',
+                                            fontWeight: "600",
+                                            // backgroundColor: "white",
+                                            width: "15rem",
+                                            textAlign: 'center',
                                             cursor: 'pointer',
-                                            backgroundColor: "white",
-                                            color: 'black',
-                                            fontWeight: "700",
-                                            padding: "0.3rem",
-                                            borderRadius: "5px",
-                                        }} value="send Link"/>
-                                    
-                        </Form>
-                        </>
-                        :<>
-                        <FormHeader>{isSignUp ? "Sign up" : "Login"}</FormHeader>
-                        <Form onSubmit={(e) => validateForm(e)} >
-                            {
-                                isSignUp ?
-                                    <>
-                                        {/* <Input placeholder="Enter your name" name="name" type='text' onChange={(e) => updateInputFields(e, 'signUp')} value={signUp.name} required /> */}
-                                        <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.email} required autoComplete='off' />
-                                        <IconContainer>
-                                            <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.password} required autoComplete='off' />
-                                            <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
-                                                {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                            </Icon>
-                                        </IconContainer>
-                                        <Input placeholder="Confirm your password" name="confirmPassword" type='password' onChange={(e) => updateInputFields(e, 'signUp')} value={signUpValues.confirmPassword} required autoComplete='off' />
-                                        <Input type='submit' sx={{
-                                            cursor: 'pointer',
-                                            backgroundColor: "white",
-                                            color: 'black',
-                                            fontWeight: "700",
-                                            padding: "0.3rem",
-                                            borderRadius: "5px",
-                                        }}
-                                        />
-                                    </>
-                                    :
-                                    <>
-                                        <Input placeholder="Enter your email" name='email' type='email' onChange={(e) => updateInputFields(e, 'login')} value={loginValues.email} required autoComplete='off' />
-    
-                                        <IconContainer>
-                                            <Input placeholder="Enter your password" name="password" type={isVisible ? "password" : "text"} onChange={(e) => updateInputFields(e, 'login')} value={loginValues.password} required autoComplete='off' />
-                                            <Icon onClick={() => (setIsVisible(isVisible => !isVisible))}>
-                                                {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                            </Icon>
-                                        </IconContainer>
-                                        <Input type='submit' sx={{
-                                            cursor: 'pointer',
-                                            backgroundColor: "white",
-                                            color: 'black',
-                                            fontWeight: "700",
-                                            padding: "0.3rem",
-                                            borderRadius: "5px",
-                                        }} />
-                                    </>
-                            }
-                        </Form>
-                        <SignUpLabel onClick={() => toggleSignUpLabel()}>
-                        <Box sx={{
-                            // color: 'black',
-                            fontWeight: "600",
-                            // backgroundColor: "white",
-                            width: "15rem",
-                            textAlign: 'center',
-                            cursor:'pointer',
-                            borderRadius: "15px"
-                        }}>{isSignUp ? <ToggleText>Login</ToggleText>
-                            : <ToggleText>Sign Up</ToggleText>}</Box>
-                    </SignUpLabel>
-                        </>
-                    }
-                    
+                                            borderRadius: "15px"
+                                        }}>{isSignUp ? <ToggleText>Login</ToggleText>
+                                            : <ToggleText>Sign Up</ToggleText>}</Box>
+                                    </SignUpLabel>
+                                </>
+                        }
 
 
 
-                    
 
-                            <div onClick={()=>setForgotPassword(!isForgotPassword)}
-                                style={{display:"flex",justifyContent:"center",alignItems:"center",marginTop:"1.5rem",fontWeight:"600"}}
-                                >{isForgotPassword?"Log In":"Forgot password"}</div>
-                </Card>
-            </CardContainer>
-        </GridContainer>
-)
+
+
+                        <div onClick={() => setForgotPassword(!isForgotPassword)}
+                            style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "1.5rem", fontWeight: "600" }}
+                        >{isForgotPassword ? "Log In" : "Forgot password"}</div>
+                    </Card>
+                </CardContainer>
+            </GridContainer>
+    )
 }
 
 export default Login;
