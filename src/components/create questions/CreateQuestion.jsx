@@ -230,7 +230,7 @@ const CreateQuestion = () => {
                     background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
                     height: "100%",
                     width: "100%",
-                    gap: 7,
+                    gap: 6,
                     // p: 2
                 }}
             >

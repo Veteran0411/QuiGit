@@ -167,7 +167,7 @@ const AllPlayers = () => {
             <Typography
                 variant="subtitle1"
                 gutterBottom
-                sx={{ color: "#ffcc80", textShadow: "1px 1px 3px rgba(0,0,0,0.6)" }}
+                sx={{ color: "#ffcc80", textShadow: "1px 1px 3px rgba(0,0,0,0.6)",fontSize:"2rem" }}
             >
                 Game Pin: <strong>{gamePin}</strong>
             </Typography>

@@ -291,7 +291,7 @@ const Login = () => {
                                         fontWeight: "700",
                                         padding: "0.3rem",
                                         borderRadius: "5px",
-                                    }} value="send Link" />
+                                    }} value="Send Link" />
 
                                 </Form>
                             </>
