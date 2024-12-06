@@ -168,7 +168,8 @@ const Login = () => {
         e.preventDefault();
 
         // Email regex
-        const emailRegex = /^.+\.git\.edu$/;
+        // const emailRegex = /^.+\git\.edu$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)*git\.edu$/;
 
         // Password regex
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
@@ -247,7 +248,7 @@ const Login = () => {
 
     const handleForgotPassword = async (e) => {
         e.preventDefault();
-        const emailRegex = /^.+\.git\.edu$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)*git\.edu$/;
         const emailValid = emailRegex.test(forgotEmail);
 
         if (!emailValid) {
