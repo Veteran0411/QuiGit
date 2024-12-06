@@ -69,7 +69,7 @@ const CreateQuestion = () => {
             correctAnswer: "",
             imagePreview: null,
             timeLimit: 0,
-            points: 0
+            points: 0,
         });
         setQuestions(newQuestions);
         setCurrentQuestionIndex(newQuestions.length - 1);
@@ -118,6 +118,9 @@ const CreateQuestion = () => {
         newQuestions[index].type = value;
         if (value === "image") {
             newQuestions[index].imagePreview = null;
+        } else if (value === "true-or-false") {
+            newQuestions[index].options = ["True", "False"];
+            newQuestions[index].correctOptionIndex = null;
         }
         setQuestions(newQuestions);
         localStorage.setItem("questions", JSON.stringify(newQuestions));
@@ -340,8 +343,27 @@ const CreateQuestion = () => {
                                             <MenuItem value="mcq">Multiple Choice</MenuItem>
                                             <MenuItem value="fill-in-the-blank">Fill in the Blank</MenuItem>
                                             <MenuItem value="image">Image</MenuItem>
+                                            <MenuItem value="true-or-false">True or False</MenuItem>
                                         </Select>
                                     </FormControl>
+
+                                    {questions[currentQuestionIndex].type === "true-or-false" && (
+                                        <RadioGroup
+                                            value={questions[currentQuestionIndex].correctOptionIndex}
+                                            onChange={(e) => handleCorrectOptionChange(currentQuestionIndex, parseInt(e.target.value))}
+                                        >
+                                            {questions[currentQuestionIndex].options.map((option, optionIndex) => (
+                                                <FormControlLabel
+                                                    key={optionIndex}
+                                                    value={optionIndex}
+                                                    control={<Radio />}
+                                                    label={option}
+                                                />
+                                            ))}
+                                        </RadioGroup>
+                                    )}
+
+                                    
                                     {questions[currentQuestionIndex].type === "mcq" && (
                                         <RadioGroup
                                             value={questions[currentQuestionIndex].correctOptionIndex}

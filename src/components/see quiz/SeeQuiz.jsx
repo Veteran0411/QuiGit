@@ -83,7 +83,7 @@ const SeeQuiz = () => {
             {quizData.length > 0 ? (
                 quizData.map((question, index) => {
                     const correctAnswer =
-                        question.type === "mcq" || question.type === "image"
+                        question.type === "mcq" || question.type === "image" ||question.type ==="true-or-false"
                             ? question.correctOptionValue
                             : question.type === "fill-in-the-blank"
                             ? question.correctAnswer

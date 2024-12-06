@@ -11,7 +11,7 @@ import {
     TextField,
     Button,
 } from "@mui/material";
-import { doc, getDoc,setDoc, onSnapshot, updateDoc,increment } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot, updateDoc, increment } from "firebase/firestore";
 import { firestore } from "../../fireBaseConfig";
 import { toast } from "react-toastify";
 
@@ -29,7 +29,7 @@ const DisplayQuestions = () => {
     const [timer, setTimer] = useState(null); // Timer for the question
     const [playerAnswer, setPlayerAnswer] = useState(""); // Player's answer
     const [isSubmitted, setIsSubmitted] = useState(false); // To track if player has submitted their answer
-    const [points,setPoints]=useState(0);
+    const [points, setPoints] = useState(0);
 
     useEffect(() => {
         if (!user || !gamePin) return;
@@ -63,23 +63,23 @@ const DisplayQuestions = () => {
 
         // Listen for real-time updates
         const unsubscribe = onSnapshot(gameDocRef, (docSnapshot) => {
-    const gameData = docSnapshot.data();
-    if (gameData) {
-        for (const [gameId, gameDetails] of Object.entries(gameData)) {
-            if (String(gameDetails.gamePin) === String(gamePin)) {
-                setQuestions([...gameDetails.questions]);
-                setCurrentQuestionIndex(gameDetails.currentQuestion || 0);
+            const gameData = docSnapshot.data();
+            if (gameData) {
+                for (const [gameId, gameDetails] of Object.entries(gameData)) {
+                    if (String(gameDetails.gamePin) === String(gamePin)) {
+                        setQuestions([...gameDetails.questions]);
+                        setCurrentQuestionIndex(gameDetails.currentQuestion || 0);
 
-                // Check if the game has ended (no more questions)
-                if (gameDetails.currentQuestion >= gameDetails.questions.length) {
-                    toast.success("Game Complete");
-                    navigate(`/leaderBoard?gamePin=${gamePin}`);
+                        // Check if the game has ended (no more questions)
+                        if (gameDetails.currentQuestion >= gameDetails.questions.length) {
+                            toast.success("Game Complete");
+                            navigate(`/leaderBoard?gamePin=${gamePin}`);
+                        }
+                        break;
+                    }
                 }
-                break;
             }
-        }
-    }
-});
+        });
 
         return () => unsubscribe(); // Cleanup listener on component unmount
     }, [user, gamePin, navigate]);
@@ -88,7 +88,7 @@ const DisplayQuestions = () => {
         setIsSubmitted(false);
         setPlayerAnswer("");
     }, [currentQuestionIndex]);
-    
+
 
     useEffect(() => {
         if (questions.length === 0) return;
@@ -152,7 +152,7 @@ const DisplayQuestions = () => {
     const handleSubmitAnswer = async () => {
         const currentQuestion = questions[currentQuestionIndex];
         let isCorrect = false;
-    
+
         // Check if the answer is correct
         if (currentQuestion.type === "mcq" || currentQuestion.type === "image") {
             if (playerAnswer === currentQuestion.correctOptionValue) {
@@ -162,44 +162,48 @@ const DisplayQuestions = () => {
             if (playerAnswer.toLowerCase() === currentQuestion.correctAnswer.toLowerCase()) {
                 isCorrect = true;
             }
+        }else if (currentQuestion.type === "true-or-false") {
+            if (playerAnswer.toLowerCase() === currentQuestion.correctOptionValue.toLowerCase()) {
+                isCorrect = true;
+            }
         }
-    
+
         setIsSubmitted(true); // Disable further submissions
-    
+
         // Display success or failure message based on correctness
         toast.success("Answer submitted");
-    
+
         try {
             // Create or update the leaderboard document
             const leaderboardDocRef = doc(firestore, "leaderboard", gamePin); // Assume 'leaderboard' collection tracks scores
             const playerDataPath = `players.${user.email}`; // Path to the player's data using email as the unique ID
-    
+
             // Ensure points are stored as numbers (default to 0 if not available)
             const points = Number(currentQuestion.points) || 0;
-    
+
             // Retrieve the current leaderboard data
             const playerDoc = await getDoc(leaderboardDocRef);
             const leaderboardData = playerDoc.exists() ? playerDoc.data() : {};
             const currentPlayerData = leaderboardData.players?.[user.email] || {};
-    
+
             const currentQuestions = currentPlayerData.questions || {};
             const currentTotalScore = currentPlayerData.totalScore || 0;
             const hasCompleted = currentPlayerData.hasCompleted || false;
-    
+
             // Do not update scores if the player has already completed the game
             if (hasCompleted) {
                 toast.warning("You have already completed the game. Scores cannot be updated.");
                 return;
             }
-    
+
             // Update the questions and total score
             const updatedQuestions = {
                 ...currentQuestions,
                 [currentQuestion.question]: isCorrect ? points : 0, // Store the question as the key with its points
             };
-    
+
             const updatedTotalScore = currentTotalScore + (isCorrect ? points : 0); // Increment total score
-    
+
             // Set or update the player data correctly within the 'players' object
             await setDoc(
                 leaderboardDocRef,
@@ -218,14 +222,14 @@ const DisplayQuestions = () => {
         } catch (error) {
             toast.error("Failed to update score.");
         }
-    
+
         // If it's the last question, navigate to the dashboard
         if (currentQuestionIndex >= questions.length - 1) {
             toast.success("Game completed");
             navigate("/dashBoard");
         }
     };
-    
+
 
     if (questions.length === 0) {
         return (
@@ -286,7 +290,7 @@ const DisplayQuestions = () => {
 
             {/* Options for players */}
             {currentQuestion.type === "mcq" && !isHost && (
-                <RadioGroup onChange={handlePlayerAnswerChange}>
+                <RadioGroup onChange={handlePlayerAnswerChange} value={playerAnswer}>
                     {currentQuestion.options.map((option, index) => (
                         <FormControlLabel
                             key={index}
@@ -296,6 +300,23 @@ const DisplayQuestions = () => {
                             sx={{ color: "white" }}
                         />
                     ))}
+                </RadioGroup>
+            )}
+
+            {currentQuestion.type === "true-or-false" && !isHost && (
+                <RadioGroup onChange={handlePlayerAnswerChange} value={playerAnswer}>
+                    <FormControlLabel
+                        value="true"
+                        control={<Radio sx={{ color: "white" }} />}
+                        label="True"
+                        sx={{ color: "white" }}
+                    />
+                    <FormControlLabel
+                        value="false"
+                        control={<Radio sx={{ color: "white" }} />}
+                        label="False"
+                        sx={{ color: "white" }}
+                    />
                 </RadioGroup>
             )}
 

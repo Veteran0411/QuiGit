@@ -347,6 +347,16 @@ const Dashboard = () => {
                                                 >
                                                     Delete Game
                                                 </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    sx={{ backgroundColor: "#16a085", color: "#fff" }}
+                                                    onClick={() =>
+                                                        navigate(`/seeQuiz?gamePin=${game.gamePin}`)
+                                                    }
+                                                >
+                                                    See Quiz
+                                                </Button>
                                             </CardActions>
                                         </Card>
                                     </Grid>
