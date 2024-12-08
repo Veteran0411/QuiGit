@@ -159,7 +159,10 @@ const DisplayQuestions = () => {
                 isCorrect = true;
             }
         } else if (currentQuestion.type === "fill-in-the-blank") {
-            if (playerAnswer.toLowerCase() === currentQuestion.correctAnswer.toLowerCase()) {
+            const normalizeAnswer = (answer) =>
+                answer?.trim().replace(/\u00A0/g, "").toLowerCase(); // Trim, remove non-breaking spaces, and convert to lowercase
+    
+            if (normalizeAnswer(playerAnswer) === normalizeAnswer(currentQuestion.correctAnswer)) {
                 isCorrect = true;
             }
         }else if (currentQuestion.type === "true-or-false") {
@@ -305,19 +308,16 @@ const DisplayQuestions = () => {
 
             {currentQuestion.type === "true-or-false" && !isHost && (
                 <RadioGroup onChange={handlePlayerAnswerChange} value={playerAnswer}>
+                {currentQuestion.options.map((option, index) => (
                     <FormControlLabel
-                        value="true"
+                        key={index}
+                        value={option}
                         control={<Radio sx={{ color: "white" }} />}
-                        label="True"
+                        label={option}
                         sx={{ color: "white" }}
                     />
-                    <FormControlLabel
-                        value="false"
-                        control={<Radio sx={{ color: "white" }} />}
-                        label="False"
-                        sx={{ color: "white" }}
-                    />
-                </RadioGroup>
+                ))}
+            </RadioGroup>
             )}
 
             {/* Input field for fill-in-the-blank questions */}
