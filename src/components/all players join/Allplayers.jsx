@@ -41,6 +41,7 @@ const AllPlayers = () => {
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const [gameCreatorEmail, setGameCreatorEmail] = useState(""); // Store game creator's email
     const [gameStatus, setGameStatus] = useState(""); // Game status ("waiting" or "started")
+    const [playersCount,setPlayerCount]=useState("");
 
     useEffect(() => {
         // Ensure the user is set in Redux state
@@ -66,6 +67,7 @@ const AllPlayers = () => {
                         setGameCreatorEmail(gameDetails.createdBy); // Set game creator's email
                         setGameStatus(gameDetails.gameStatus); // Track game status
                         setIsLoading(false); // Stop loading
+                        setPlayerCount(gameDetails.players.length);
                         return;
                     }
                 }
@@ -162,7 +164,7 @@ const AllPlayers = () => {
                 gutterBottom
                 sx={{ color: "white", textShadow: "1px 1px 3px rgba(0,0,0,0.6)" }}
             >
-                All Players
+                Players joined {playersCount?playersCount:0}
             </Typography>
             <Typography
                 variant="subtitle1"

@@ -268,7 +268,7 @@ const DisplayQuestions = () => {
             {/* Display timer only for the host */}
             {isHost && (
                 <Typography
-                    variant="h6"
+                    variant="h5"
                     sx={{
                         position: "absolute",
                         top: 16,
@@ -286,7 +286,7 @@ const DisplayQuestions = () => {
 
             {/* Question and options for the host */}
             {isHost && (
-                <Typography variant="h5" sx={{ mb: 2 }}>
+                <Typography variant="h2" sx={{ mb: 2 }}>
                     {`Q${currentQuestionIndex + 1}: ${currentQuestion.question}`}
                 </Typography>
             )}
