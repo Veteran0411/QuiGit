@@ -265,7 +265,7 @@ const DisplayQuestions = () => {
             {/* Display timer only for the host */}
             {isHost && (
                 <Typography
-                    variant="h6"
+                    variant="h5"
                     sx={{
                         position: "absolute",
                         top: 16,
