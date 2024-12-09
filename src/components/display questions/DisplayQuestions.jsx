@@ -283,7 +283,7 @@ const DisplayQuestions = () => {
 
             {/* Question and options for the host */}
             {isHost && (
-                <Typography variant="h5" sx={{ mb: 2 }}>
+                <Typography variant="h2" sx={{ mb: 2 }}>
                     {`Q${currentQuestionIndex + 1}: ${currentQuestion.question}`}
                 </Typography>
             )}
