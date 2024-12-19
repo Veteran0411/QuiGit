@@ -152,7 +152,7 @@ const DisplayQuestions = () => {
     const handleSubmitAnswer = async () => {
         const currentQuestion = questions[currentQuestionIndex];
         let isCorrect = false;
-
+    
         // Check if the answer is correct
         if (currentQuestion.type === "mcq" || currentQuestion.type === "image") {
             if (playerAnswer === currentQuestion.correctOptionValue) {
@@ -165,48 +165,54 @@ const DisplayQuestions = () => {
             if (normalizeAnswer(playerAnswer) === normalizeAnswer(currentQuestion.correctAnswer)) {
                 isCorrect = true;
             }
-        }else if (currentQuestion.type === "true-or-false") {
+        } else if (currentQuestion.type === "true-or-false") {
             if (playerAnswer.toLowerCase() === currentQuestion.correctOptionValue.toLowerCase()) {
                 isCorrect = true;
             }
         }
-
+    
         setIsSubmitted(true); // Disable further submissions
-
+    
         // Display success or failure message based on correctness
         toast.success("Answer submitted");
-
+    
         try {
             // Create or update the leaderboard document
             const leaderboardDocRef = doc(firestore, "leaderboard", gamePin); // Assume 'leaderboard' collection tracks scores
             const playerDataPath = `players.${user.email}`; // Path to the player's data using email as the unique ID
-
+    
             // Ensure points are stored as numbers (default to 0 if not available)
             const points = Number(currentQuestion.points) || 0;
-
+    
             // Retrieve the current leaderboard data
             const playerDoc = await getDoc(leaderboardDocRef);
             const leaderboardData = playerDoc.exists() ? playerDoc.data() : {};
             const currentPlayerData = leaderboardData.players?.[user.email] || {};
-
+    
             const currentQuestions = currentPlayerData.questions || {};
             const currentTotalScore = currentPlayerData.totalScore || 0;
             const hasCompleted = currentPlayerData.hasCompleted || false;
-
+    
+            // Check if the player has already answered the current question
+            if (currentQuestions[currentQuestion.question] !== undefined) {
+                toast.warning("You have already submitted this question. Scores cannot be updated.");
+                return;
+            }
+    
             // Do not update scores if the player has already completed the game
             if (hasCompleted) {
                 toast.warning("You have already completed the game. Scores cannot be updated.");
                 return;
             }
-
+    
             // Update the questions and total score
             const updatedQuestions = {
                 ...currentQuestions,
                 [currentQuestion.question]: isCorrect ? points : 0, // Store the question as the key with its points
             };
-
+    
             const updatedTotalScore = currentTotalScore + (isCorrect ? points : 0); // Increment total score
-
+    
             // Set or update the player data correctly within the 'players' object
             await setDoc(
                 leaderboardDocRef,
@@ -225,13 +231,14 @@ const DisplayQuestions = () => {
         } catch (error) {
             toast.error("Failed to update score.");
         }
-
+    
         // If it's the last question, navigate to the dashboard
         if (currentQuestionIndex >= questions.length - 1) {
             toast.success("Game completed");
             navigate("/dashBoard");
         }
     };
+    
 
 
     if (questions.length === 0) {
